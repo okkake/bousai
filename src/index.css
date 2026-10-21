@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    margin: 0;
+    padding-bottom: 40px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+    background-color: #f2f5f7;
+    color: #222222;
+    min-height: 100vh;
+  }
+}
+
+/* Custom disaster card borders */
+.earthquake-safe {
+  border-left: 6px solid #28a745;
+}
+.earthquake-yellow {
+  border-left: 6px solid #ffc107;
+}
+.earthquake-orange {
+  border-left: 6px solid #ff6600;
+}
+.earthquake-red {
+  border-left: 6px solid #dc3545;
+}
+.earthquake-emergency {
+  border-left: 6px solid #8b0000;
+}
+
+.weather-safe {
+  border-left: 6px solid #28a745;
+}
+.weather-warning {
+  border-left: 6px solid #ffc107;
+}
+.weather-danger {
+  border-left: 6px solid #dc3545;
+}
+.weather-critical {
+  border-left: 6px solid #8000cc;
+}
+.weather-emergency {
+  border-left: 6px solid #040202;
+}
+
+.overall-safe {
+  background-color: #dff5e1;
+  border: 3px solid #28a745;
+  color: #176b2c;
+}
+.overall-warning {
+  background-color: #fff3cd;
+  border: 3px solid #ffc107;
+  color: #856404;
+}
+.overall-danger {
+  background-color: #ffe0cc;
+  border: 3px solid #ff6600;
+  color: #b34700;
+}
+.overall-critical {
+  background-color: #ead6f7;
+  border: 3px solid #8000cc;
+  color: #5a008f;
+}
+.overall-emergency {
+  background-color: #ffdddd;
+  border: 3px solid #dc3545;
+  color: #b00000;
+}

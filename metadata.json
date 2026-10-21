@@ -1,0 +1,8 @@
+{
+  "name": "防災アプリ (Disaster Preparedness & Alerts)",
+  "description": "リアルタイム地震速報・津波情報・気象警報、避難所マップ検索、非常用持ち出しチェックリスト、災害時行動マニュアル、家族連絡メモ、防災クイズを備えた総合防災支援アプリ",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
