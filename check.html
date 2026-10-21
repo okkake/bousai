@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>防災チェック</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <h1>🎒 防災チェック</h1>
+
+    <div class="disaster-card">
+
+        <h2>📋 防災用品をチェック</h2>
+
+        <p>
+            災害に備えて、必要なものを確認しましょう。
+        </p>
+
+        <div class="check-list">
+
+            <label class="check-item">
+                <input type="checkbox">
+                💧 水・飲料水
+            </label>
+
+            <label class="check-item">
+                <input type="checkbox">
+                🍚 非常食
+            </label>
+
+            <label class="check-item">
+                <input type="checkbox">
+                🔦 懐中電灯
+            </label>
+
+            <label class="check-item">
+                <input type="checkbox">
+                🔋 モバイルバッテリー
+            </label>
+
+            <label class="check-item">
+                <input type="checkbox">
+                🩹 救急用品
+            </label>
+
+            <label class="check-item">
+                <input type="checkbox">
+                🧻 ティッシュ・タオル
+            </label>
+
+            <label class="check-item">
+                <input type="checkbox">
+                🧥 防寒具
+            </label>
+
+            <label class="check-item">
+                <input type="checkbox">
+                😷 マスク
+            </label>
+
+        </div>
+
+    </div>
+
+    <a href="index.html" class="back-button">
+        ← ホームに戻る
+    </a>
+
+
+    <script>
+        const checks = document.querySelectorAll(".check-item input");
+
+        checks.forEach((checkbox, index) => {
+
+            // 保存されているチェック状態を読み込む
+            const saved = localStorage.getItem("bousai-check-" + index);
+
+            checkbox.checked = saved === "true";
+
+            // チェックしたら保存する
+            checkbox.addEventListener("change", () => {
+                localStorage.setItem(
+                    "bousai-check-" + index,
+                    checkbox.checked
+                );
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,764 @@
+* {
+    box-sizing: border-box;
+}
+
+/* =========================
+   基本
+   ========================= */
+
+body {
+    margin: 0;
+    padding: 0 0 40px;
+    font-family: sans-serif;
+    background-color: #f2f5f7;
+    color: #222;
+}
+
+header {
+    background-color: #d32f2f;
+    color: white;
+    text-align: center;
+    padding: 25px 15px;
+}
+
+header h1 {
+    margin: 0 0 8px;
+    font-size: 32px;
+}
+
+header p {
+    margin: 0;
+    font-size: 15px;
+}
+
+main {
+    width: 90%;
+    max-width: 600px;
+    margin: 25px auto;
+}
+
+/* =========================
+   ホーム画面
+   ========================= */
+
+.menu-button {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 18px;
+
+    border: none;
+    border-radius: 12px;
+
+    background-color: white;
+    text-align: left;
+    cursor: pointer;
+
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+.menu-button:hover {
+    background-color: #eeeeee;
+    transform: translateY(-2px);
+}
+
+.menu-button span {
+    display: block;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.menu-button small {
+    font-size: 14px;
+    color: #666;
+}
+
+/* =========================
+   災害情報カード
+   ========================= */
+
+/*
+   すべての災害カードの横幅を統一
+*/
+
+.disaster-card {
+    width: 100%;
+    max-width: 600px;
+
+    margin: 20px auto;
+    padding: 20px;
+
+    background-color: white;
+    border-radius: 12px;
+
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* 見出し */
+
+h1 {
+    text-align: center;
+}
+
+.disaster-card h2 {
+    margin-top: 0;
+    color: #d32f2f;
+}
+
+.disaster-card p {
+    font-size: 16px;
+    margin: 12px 0;
+}
+
+/* =========================
+   災害速報
+   ========================= */
+
+/* 地震 */
+
+.earthquake-card {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+/* 地震の危険度 */
+
+.earthquake-safe {
+    border-left: 6px solid #28a745;
+}
+
+.earthquake-yellow {
+    border-left: 6px solid #ffc107;
+}
+
+.earthquake-orange {
+    border-left: 6px solid #ff6600;
+}
+
+.earthquake-red {
+    border-left: 6px solid #dc3545;
+}
+
+.earthquake-emergency {
+    border-left: 6px solid #8b0000;
+}
+
+/* =========================
+   警告表示
+   ========================= */
+
+.warning {
+    margin-top: 20px;
+    padding: 15px;
+
+    background-color: #fff3cd;
+    border-radius: 8px;
+
+    font-weight: bold;
+}
+
+/* =========================
+   地震情報 更新ボタン
+   ========================= */
+
+.update-button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 15px;
+
+    border: none;
+    border-radius: 10px;
+
+    background-color: #1976d2;
+    color: white;
+
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.update-button:hover {
+    background-color: #1565c0;
+}
+
+.update-time {
+    text-align: center;
+    color: #666;
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+/* =========================
+   津波情報
+   ========================= */
+
+.tsunami-card {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.tsunami-card h2 {
+    color: #0088cc;
+}
+
+/* =========================
+   気象警報・注意報
+   ========================= */
+
+.weather-card {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+/* 安全 */
+
+.weather-safe {
+    border-left: 6px solid #28a745;
+}
+
+/* 注意報 */
+
+.weather-warning {
+    border-left: 6px solid #ffc107;
+}
+
+/* 危険警報 */
+
+.weather-critical {
+    border-left: 6px solid #8000cc;
+}
+
+/* 警報 */
+
+.weather-danger {
+    border-left: 6px solid #dc3545;
+}
+
+/* 特別警報 */
+
+.weather-emergency {
+    border-left: 6px solid #040202;
+}
+
+/* 気象情報の警告ボックス */
+
+.weather-critical .warning {
+    background-color: #ead6f7;
+    border: 2px solid #8000cc;
+    color: #5a008f;
+}
+
+.weather-emergency .warning {
+    background-color: #ffdddd;
+    border: 2px solid #dc3545;
+    color: #b00000;
+}
+
+.weather-danger .warning {
+    background-color: #ffdddd;
+    border: 2px solid #dc3545;
+    color: #b00000;
+}
+
+.weather-warning .warning {
+    background-color: #fff3cd;
+    border: 2px solid #ffc107;
+}
+
+.weather-safe .warning {
+    background-color: #dff5e1;
+    border: 2px solid #28a745;
+}
+
+/* =========================
+   戻るボタン
+   ========================= */
+
+.back-button {
+    display: block;
+
+    width: 90%;
+    max-width: 600px;
+
+    margin: 20px auto;
+    padding: 15px;
+
+    background-color: #555;
+    color: white;
+
+    text-align: center;
+    text-decoration: none;
+
+    border-radius: 10px;
+
+    font-weight: bold;
+}
+
+.back-button:hover {
+    background-color: #333;
+}
+
+/* =========================
+   地図ボタン
+   ========================= */
+
+.map-button {
+    display: inline-block;
+
+    margin-top: 12px;
+    padding: 10px 16px;
+
+    background-color: #2196f3;
+    color: white;
+
+    text-decoration: none;
+    border-radius: 8px;
+
+    font-weight: bold;
+}
+
+.map-button:hover {
+    opacity: 0.8;
+}
+
+/* =========================
+   避難場所
+   ========================= */
+
+.shelter-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.shelter {
+    background-color: #f5f5f5;
+
+    border-left: 6px solid #28a745;
+    border-radius: 10px;
+
+    padding: 15px;
+}
+
+.shelter h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.shelter p {
+    margin-bottom: 0;
+    line-height: 1.6;
+}
+
+/* =========================
+   避難場所の地図
+   ========================= */
+
+.map-container {
+    margin-top: 20px;
+}
+
+.map-container h3 {
+    margin-bottom: 10px;
+}
+
+.gsi-map {
+    width: 100%;
+    height: 450px;
+
+    border: 0;
+    border-radius: 10px;
+}
+
+/* =========================
+   防災チェック
+   ========================= */
+
+.check-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.check-item {
+    display: block;
+
+    padding: 15px;
+
+    background-color: #f5f5f5;
+    border-radius: 10px;
+
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.check-item input {
+    width: 20px;
+    height: 20px;
+
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.check-item:has(input:checked) {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+/* =========================
+   災害時の行動
+   ========================= */
+
+.action-card {
+    margin-top: 20px;
+    padding: 15px;
+
+    border-radius: 10px;
+    background-color: #f5f5f5;
+}
+
+.action-card h3 {
+    margin-top: 0;
+}
+
+.action-card ol {
+    margin-bottom: 0;
+    padding-left: 25px;
+}
+
+.action-card li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.earthquake-action {
+    border-left: 6px solid #dc3545;
+}
+
+.tsunami-action {
+    border-left: 6px solid #0088cc;
+}
+
+.rain-action {
+    border-left: 6px solid #2196f3;
+}
+
+.fire-action {
+    border-left: 6px solid #ff6600;
+}
+
+/* =========================
+   家族との連絡
+   ========================= */
+
+.family-form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.family-form label {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+    font-weight: bold;
+}
+
+.family-form input,
+.family-form textarea {
+    box-sizing: border-box;
+
+    width: 100%;
+    padding: 12px;
+
+    border: 1px solid #ccc;
+    border-radius: 8px;
+
+    font-size: 16px;
+}
+
+.family-form textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.save-button {
+    padding: 14px;
+
+    border: none;
+    border-radius: 8px;
+
+    background-color: #28a745;
+    color: white;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.save-button:hover {
+    opacity: 0.8;
+}
+
+.save-message {
+    margin: 0;
+
+    text-align: center;
+    font-weight: bold;
+}
+
+/* =========================
+   防災クイズ
+   ========================= */
+
+#question {
+    font-size: 18px;
+    font-weight: bold;
+
+    line-height: 1.6;
+    margin-top: 20px;
+}
+
+#answers {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.quiz-answer {
+    width: 100%;
+    padding: 14px;
+
+    border: none;
+    border-radius: 8px;
+
+    background-color: #2196f3;
+    color: white;
+
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.quiz-answer:hover {
+    opacity: 0.8;
+}
+
+#result {
+    margin-top: 20px;
+
+    font-size: 20px;
+    font-weight: bold;
+
+    text-align: center;
+}
+
+#score {
+    text-align: center;
+    font-weight: bold;
+}
+
+/* =========================
+   スマホ対応
+   ========================= */
+
+@media (max-width: 600px) {
+
+    body {
+        padding-top: 15px;
+    }
+
+    .disaster-card,
+    .earthquake-card,
+    .tsunami-card,
+    .weather-card {
+        width: 94%;
+        padding: 16px;
+    }
+
+    .menu-button {
+        width: 100%;
+    }
+
+    .back-button {
+        width: 94%;
+    }
+}
+
+
+/* =========================
+   現在の危険度表示
+   ========================= */
+
+.overall-status {
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 18px;
+
+    box-sizing: border-box;
+
+    border-radius: 12px;
+
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* 安全 */
+
+.overall-safe {
+    background-color: #dff5e1;
+    border: 3px solid #28a745;
+    color: #176b2c;
+}
+
+/* 注意 */
+
+.overall-warning {
+    background-color: #fff3cd;
+    border: 3px solid #ffc107;
+    color: #856404;
+}
+
+/* 危険 */
+
+.overall-danger {
+    background-color: #ffe0cc;
+    border: 3px solid #ff6600;
+    color: #b34700;
+}
+
+/* 非常に危険 */
+
+.overall-emergency {
+    background-color: #ffdddd;
+    border: 3px solid #dc3545;
+    color: #b00000;
+}
+/* =========================
+   危険警報
+   ========================= */
+
+.overall-critical {
+    background-color: #ead6f7;
+    border: 3px solid #8000cc;
+    color: #5a008f;
+}
+
+
+/* 発表されている警報・注意報の種類 */
+.weather-details {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #fff3cd;
+
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.weather-details::before {
+    content: "発表内容";
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+/* 🔴 警報 */
+.weather-details.details-danger {
+    background-color: #ffdddd;
+    border: 2px solid #dc3545;
+}
+
+/* 🟣 危険警報 */
+.weather-details.details-critical {
+    background-color: #ead6f7;
+    border: 2px solid #8000cc;
+}
+
+/* ⚫ 特別警報 */
+.weather-details.details-emergency {
+    background-color: #e0e0e0;
+    border: 2px solid #222222;
+}
+
+
+
+/* 危険度レベルの凡例 */
+.weather-level-legend {
+    position: absolute;
+    top: 55px;
+    right: 20px;
+    width: 205px;
+    padding: 8px;
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.9;
+    z-index: 1;
+}
+
+.weather-card {
+    position: relative;
+}
+
+.weather-level-legend > div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.level-color {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    border: 1px solid #777777;
+}
+
+.level-5 {
+    background-color: #222222;
+}
+
+.level-4 {
+    background-color: #8000cc;
+}
+
+.level-3 {
+    background-color: #dc3545;
+}
+
+.level-2 {
+    background-color: #ffc107;
+}
+
+.level-0 {
+    background-color: #28a745;
+}
+
+/* スマホでは凡例を通常の位置に表示 */
+@media (max-width: 600px) {
+    .weather-level-legend {
+        position: static;
+        width: auto;
+        margin: 10px 0;
+    }
+}
