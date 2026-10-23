@@ -27,6 +27,7 @@ export const Shelters: React.FC<SheltersProps> = ({ onBack }) => {
   const [appliedSearch, setAppliedSearch] = useState<string>('');
   const [targetCoords, setTargetCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [showGsiMap, setShowGsiMap] = useState<boolean>(false);
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('recent_shelter_searches');
@@ -486,29 +487,54 @@ export const Shelters: React.FC<SheltersProps> = ({ onBack }) => {
           <div className="leading-relaxed">{notice.advice}</div>
         </div>
 
-        {/* 国土地理院 防災地図（現在地に連動） */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-base font-bold text-neutral-800 m-0 flex items-center gap-1.5">
-              🗺️ 周辺の防災地図（国土地理院）
-            </h3>
-            <a
-              href={getGsiMapUrl()}
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs text-[#1976d2] hover:underline font-semibold"
-            >
-              拡大地図で開く ↗
-            </a>
-          </div>
-          <div className="w-full h-[360px] rounded-lg overflow-hidden border border-neutral-300 shadow-2xs">
-            <iframe
-              src={getGsiMapUrl()}
-              className="w-full h-full border-0"
-              title="国土地理院の地図"
-              loading="lazy"
-            />
-          </div>
+        {/* 国土地理院 防災地図（普段は非表示、必要な時だけ開閉） */}
+        <div className="border border-neutral-200 rounded-xl overflow-hidden bg-white shadow-2xs">
+          <button
+            type="button"
+            onClick={() => setShowGsiMap((prev) => !prev)}
+            className="w-full p-3.5 flex items-center justify-between text-left hover:bg-neutral-50 transition-colors cursor-pointer"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🗺️</span>
+              <div>
+                <span className="font-bold text-sm text-neutral-800 block">
+                  国土地理院 防災地図（標高・詳細地形）
+                </span>
+                <span className="text-xs text-neutral-500 block font-normal">
+                  {showGsiMap ? 'タップで地図を閉じます' : 'タップで地図を展開・表示します'}
+                </span>
+              </div>
+            </div>
+            <span className="text-xs font-bold py-1 px-2.5 rounded-md bg-neutral-100 text-neutral-700 border border-neutral-200 shrink-0">
+              {showGsiMap ? '閉じる ▲' : '表示する ▼'}
+            </span>
+          </button>
+
+          {showGsiMap && (
+            <div className="p-3.5 pt-0 border-t border-neutral-100 space-y-2.5">
+              <div className="flex items-center justify-between pt-2">
+                <span className="text-xs text-neutral-500">
+                  ※標高や詳細地形、等高線を確認したい場合にご利用ください
+                </span>
+                <a
+                  href={getGsiMapUrl()}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-[#1976d2] hover:underline font-semibold"
+                >
+                  拡大地図で開く ↗
+                </a>
+              </div>
+              <div className="w-full h-[360px] rounded-lg overflow-hidden border border-neutral-300 shadow-2xs">
+                <iframe
+                  src={getGsiMapUrl()}
+                  className="w-full h-full border-0"
+                  title="国土地理院の地図"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* 施設別の避難場所案内カード */}

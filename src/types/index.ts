@@ -33,6 +33,7 @@ export interface WeatherData {
   status: string;
   area: string;
   warning: string;
+  headline?: string;
   details: WeatherWarningItem[];
 }
 

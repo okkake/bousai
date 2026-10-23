@@ -8,6 +8,7 @@ import { EmergencyChecklist } from './components/EmergencyChecklist';
 import { ActionGuidelines } from './components/ActionGuidelines';
 import { FamilyContact } from './components/FamilyContact';
 import { DisasterQuiz } from './components/DisasterQuiz';
+import { OfflineIndicator } from './components/OfflineIndicator';
 
 export const App: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('home');
@@ -113,6 +114,9 @@ export const App: React.FC = () => {
         {currentScreen === 'family' && <FamilyContact onBack={() => handleNavigate('home')} />}
         {currentScreen === 'quiz' && <DisasterQuiz onBack={() => handleNavigate('home')} />}
       </main>
+
+      {/* Offline Status Toast */}
+      <OfflineIndicator />
 
       {/* Emergency telephone contacts footer */}
       <footer className="mt-auto py-6 border-t border-neutral-200 text-center text-xs text-neutral-500 bg-white/70">

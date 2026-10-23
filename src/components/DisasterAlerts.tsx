@@ -400,6 +400,13 @@ export const DisasterAlerts: React.FC<DisasterAlertsProps> = ({ onBack }) => {
             </div>
           </div>
         )}
+
+        {weather?.headline && (
+          <div className="mt-2.5 p-3 bg-amber-50/70 border border-amber-200/80 rounded-lg text-xs text-neutral-800 leading-relaxed">
+            <span className="font-bold text-amber-950 block mb-0.5">📢 気象庁発表サマリー：</span>
+            <span>{weather.headline}</span>
+          </div>
+        )}
       </div>
 
       {/* ホームに戻る */}

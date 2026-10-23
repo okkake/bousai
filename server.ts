@@ -367,8 +367,99 @@ app.get('/api/geocode', async (req: Request, res: Response) => {
 });
 
 // =========================
-// 気象警報・注意報API
+// 気象警報・注意報API（気象庁公式リアルタイムAPI直接連携）
 // =========================
+const PREFECTURE_JMA_CODES: Record<string, string[]> = {
+  北海道: ['011000', '012000', '013000', '014030', '014100', '015000', '016000', '017000'],
+  青森県: ['020000'],
+  岩手県: ['030000'],
+  宮城県: ['040000'],
+  秋田県: ['050000'],
+  山形県: ['060000'],
+  福島県: ['070000'],
+  茨城県: ['080000'],
+  栃木県: ['090000'],
+  群馬県: ['100000'],
+  埼玉県: ['110000'],
+  千葉県: ['120000'],
+  東京都: ['130000'],
+  神奈川県: ['140000'],
+  新潟県: ['150000'],
+  富山県: ['160000'],
+  石川県: ['170000'],
+  福井県: ['180000'],
+  山梨県: ['190000'],
+  長野県: ['200000'],
+  岐阜県: ['210000'],
+  静岡県: ['220000'],
+  愛知県: ['230000'],
+  三重県: ['240000'],
+  滋賀県: ['250000'],
+  京都府: ['260000'],
+  大阪府: ['270000'],
+  兵庫県: ['280000'],
+  奈良県: ['290000'],
+  和歌山県: ['300000'],
+  鳥取県: ['310000'],
+  島根県: ['320000'],
+  岡山県: ['330000'],
+  広島県: ['340000'],
+  山口県: ['350000'],
+  徳島県: ['360000'],
+  香川県: ['370000'],
+  愛媛県: ['380000'],
+  高知県: ['390000'],
+  福岡県: ['400000'],
+  佐賀県: ['410000'],
+  長崎県: ['420000'],
+  熊本県: ['430000'],
+  大分県: ['440000'],
+  宮崎県: ['450000'],
+  鹿児島県: ['460100', '460040'],
+  沖縄県: ['471000', '472000', '473000', '474000'],
+};
+
+const JMA_WARNING_CODE_MAP: Record<string, { name: string; level: number }> = {
+  // レベル5 特別警報
+  '32': { name: '暴風雪特別警報', level: 5 },
+  '33': { name: '大雨特別警報', level: 5 },
+  '35': { name: '暴風特別警報', level: 5 },
+  '36': { name: '大雪特別警報', level: 5 },
+  '37': { name: '波浪特別警報', level: 5 },
+  '38': { name: '高潮特別警報', level: 5 },
+
+  // レベル4 危険警報
+  '43': { name: '大雨危険警報', level: 4 },
+  '46': { name: '高潮危険警報', level: 4 },
+
+  // レベル3 警報
+  '02': { name: '暴風雪警報', level: 3 },
+  '03': { name: '大雨警報', level: 3 },
+  '04': { name: '洪水警報', level: 3 },
+  '05': { name: '暴風警報', level: 3 },
+  '06': { name: '大雪警報', level: 3 },
+  '07': { name: '波浪警報', level: 3 },
+  '08': { name: '高潮警報', level: 3 },
+
+  // レベル2 注意報
+  '10': { name: '大雨注意報', level: 2 },
+  '12': { name: '大雪注意報', level: 2 },
+  '13': { name: '風雪注意報', level: 2 },
+  '14': { name: '雷注意報', level: 2 },
+  '15': { name: '強風注意報', level: 2 },
+  '16': { name: '波浪注意報', level: 2 },
+  '17': { name: '融雪注意報', level: 2 },
+  '18': { name: '洪水注意報', level: 2 },
+  '19': { name: '高潮注意報', level: 2 },
+  '20': { name: '濃霧注意報', level: 2 },
+  '21': { name: '乾燥注意報', level: 2 },
+  '22': { name: 'なだれ注意報', level: 2 },
+  '23': { name: '低温注意報', level: 2 },
+  '24': { name: '霜注意報', level: 2 },
+  '25': { name: '着氷注意報', level: 2 },
+  '26': { name: '着雪注意報', level: 2 },
+};
+
 app.get('/api/weather', async (req: Request, res: Response) => {
   const targetArea = (req.query.prefecture as string) || '';
 
@@ -377,6 +468,7 @@ app.get('/api/weather', async (req: Request, res: Response) => {
       status: '未選択',
       area: '---',
       warning: '都道府県を選択してください',
+      headline: '',
       details: [],
     });
   }
@@ -387,175 +479,85 @@ app.get('/api/weather', async (req: Request, res: Response) => {
   }
 
   try {
-    const response = await fetch(JMA_WEATHER_FEED, {
-      headers: { 'User-Agent': 'BousaiApp/1.0' },
-    });
-    const xml = await response.text();
-    const data = parser.parse(xml);
-
-    const entries = data.feed?.entry || [];
-    const entryList = Array.isArray(entries) ? entries : [entries];
-
-    const weatherEntries: any[] = [];
-
-    // Filter relevant entries
-    for (const entry of entryList) {
-      const title = String(entry.title || '');
-      if (!title.includes('気象警報・注意報')) {
-        continue;
-      }
-
-      let link = entry.link;
-      if (Array.isArray(link)) {
-        const xmlLink = link.find((l: any) => l['@_type'] === 'application/xml');
-        link = xmlLink ? xmlLink['@_href'] : link[0]?.['@_href'];
-      } else if (link && typeof link === 'object') {
-        link = link['@_href'];
-      }
-
-      if (!link) continue;
-
-      try {
-        const checkResponse = await fetch(link, {
-          headers: { 'User-Agent': 'BousaiApp/1.0' },
-        });
-        const checkXml = await checkResponse.text();
-        if (checkXml.includes(targetArea)) {
-          const checkData = parser.parse(checkXml);
-          weatherEntries.push(checkData);
-        }
-      } catch (e) {
-        // Continue checking other feeds
-      }
-    }
-
-    if (weatherEntries.length === 0) {
-      const safeResult = {
+    const codes = PREFECTURE_JMA_CODES[targetArea] || [];
+    if (codes.length === 0) {
+      return res.json({
         status: '発表なし',
         area: targetArea,
-        warning: '🟩 現在、気象警報・注意報は確認されていません',
+        warning: `🟩 現在、${targetArea}に気象警報・注意報は発表されていません`,
+        headline: '',
         details: [],
-      };
-      weatherCache.set(targetArea, { data: safeResult, timestamp: Date.now() });
-      return res.json(safeResult);
+      });
     }
 
-    const warningKinds: { name: string; code: string; status: string }[] = [];
+    const responses = await Promise.all(
+      codes.map((code) =>
+        fetch(`https://www.jma.go.jp/bosai/warning/data/warning/${code}.json`, {
+          headers: { 'User-Agent': 'BousaiApp/1.0 (+https://github.com/okkake/bousai)' },
+          signal: AbortSignal.timeout(3500),
+        })
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null)
+      )
+    );
 
-    function searchWarningItems(obj: any) {
-      if (!obj || typeof obj !== 'object') return;
+    const activeWarningsMap = new Map<string, { name: string; code: string; status: string; level: number }>();
+    const headlines: string[] = [];
 
-      if (obj.Item) {
-        const itemList = Array.isArray(obj.Item) ? obj.Item : [obj.Item];
-        for (const item of itemList) {
-          if (!item || typeof item !== 'object') continue;
+    for (const data of responses) {
+      if (!data) continue;
+      if (
+        data.headlineText &&
+        !data.headlineText.includes('解除') &&
+        !headlines.includes(data.headlineText)
+      ) {
+        headlines.push(data.headlineText);
+      }
 
-          let targetAreaFound = false;
-          if (item.Areas) {
-            const areaGroups = Array.isArray(item.Areas) ? item.Areas : [item.Areas];
-            for (const areas of areaGroups) {
-              if (!areas || typeof areas !== 'object') continue;
-              const areaList = areas.Area
-                ? Array.isArray(areas.Area)
-                  ? areas.Area
-                  : [areas.Area]
-                : [];
-              for (const area of areaList) {
-                if (!area || typeof area !== 'object') continue;
-                let areaName = area.Name;
-                if (areaName && typeof areaName === 'object') {
-                  areaName = areaName['#text'];
-                }
-                if (areaName && String(areaName).includes(targetArea)) {
-                  targetAreaFound = true;
-                  break;
-                }
-              }
-              if (targetAreaFound) break;
-            }
-          }
-
-          if (targetAreaFound && item.Kind) {
-            const kindList = Array.isArray(item.Kind) ? item.Kind : [item.Kind];
-            for (const kind of kindList) {
-              if (!kind || typeof kind !== 'object') continue;
-              let name = kind.Name;
-              if (name && typeof name === 'object') name = name['#text'];
-              let code = kind.Code;
-              if (code && typeof code === 'object') code = code['#text'];
-              let status = kind.Status;
-              if (status && typeof status === 'object') status = status['#text'];
-
-              if (
-                name &&
-                !String(name).includes('解除') &&
-                !String(status || '').includes('解除')
-              ) {
-                warningKinds.push({
-                  name: String(name),
-                  code: code ? String(code) : '',
-                  status: status ? String(status) : '',
-                });
-              }
+      for (const at of data.areaTypes || []) {
+        for (const a of at.areas || []) {
+          for (const w of a.warnings || []) {
+            if (w.status && !w.status.includes('解除') && !w.status.includes('なし') && w.code) {
+              const mapped = JMA_WARNING_CODE_MAP[w.code] || { name: `注意報(コード${w.code})`, level: 2 };
+              activeWarningsMap.set(mapped.name, {
+                name: mapped.name,
+                code: w.code,
+                status: w.status,
+                level: mapped.level,
+              });
             }
           }
         }
       }
-
-      for (const key in obj) {
-        if (key === 'Item') continue;
-        if (obj[key] && typeof obj[key] === 'object') {
-          searchWarningItems(obj[key]);
-        }
-      }
     }
 
-    for (const data of weatherEntries) {
-      searchWarningItems(data);
-    }
-
-    // Deduplicate
-    const uniqueWarnings: { name: string; code: string; status: string }[] = [];
-    for (const w of warningKinds) {
-      if (!uniqueWarnings.some((item) => item.name === w.name && item.code === w.code)) {
-        uniqueWarnings.push(w);
-      }
-    }
-
-    // 警報レベルが高い順（特別警報 > 危険警報 > 警報 > 注意報）にソート
-    function getWarningRank(name: string): number {
-      if (name.includes('特別警報')) return 5;
-      if (name.includes('危険警報')) return 4;
-      if (name.includes('警報')) return 3;
-      if (name.includes('注意報')) return 2;
-      return 1;
-    }
-
-    uniqueWarnings.sort((a, b) => getWarningRank(b.name) - getWarningRank(a.name));
-
+    const details = Array.from(activeWarningsMap.values()).sort((a, b) => b.level - a.level);
     let status = '発表なし';
-    let warning = '🟩 現在、気象警報・注意報は確認されていません';
-    const warningText = uniqueWarnings.map((w) => w.name).join('、');
+    let warning = `🟩 現在、${targetArea}に気象警報・注意報は発表されていません`;
 
-    if (warningText.includes('特別警報')) {
-      status = '特別警報';
-      warning = `⬛ ${targetArea}で特別警報が発表されています`;
-    } else if (warningText.includes('危険警報')) {
-      status = '危険警報';
-      warning = `🟪 ${targetArea}で危険警報が発表されています`;
-    } else if (warningText.includes('警報')) {
-      status = '警報';
-      warning = `🟥 ${targetArea}で警報が発表されています`;
-    } else if (warningText.includes('注意報')) {
-      status = '注意報';
-      warning = `🟨 ${targetArea}で注意報が発表されています`;
+    if (details.length > 0) {
+      const maxLevel = details[0].level;
+      if (maxLevel === 5) {
+        status = '特別警報';
+        warning = `⬛ ${targetArea}で特別警報が発表されています`;
+      } else if (maxLevel === 4) {
+        status = '危険警報';
+        warning = `🟪 ${targetArea}で危険警報が発表されています`;
+      } else if (maxLevel === 3) {
+        status = '警報';
+        warning = `🟥 ${targetArea}で警報が発表されています`;
+      } else {
+        status = '注意報';
+        warning = `🟨 ${targetArea}で注意報が発表されています`;
+      }
     }
 
     const result = {
       status,
       area: targetArea,
       warning,
-      details: uniqueWarnings,
+      headline: headlines.join(' '),
+      details,
     };
 
     weatherCache.set(targetArea, { data: result, timestamp: Date.now() });
@@ -566,6 +568,7 @@ app.get('/api/weather', async (req: Request, res: Response) => {
       status: '発表なし',
       area: targetArea,
       warning: `🟩 現在、${targetArea}の気象警報・注意報はありません`,
+      headline: '',
       details: [],
     });
   }
