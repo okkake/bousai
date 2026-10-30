@@ -3,6 +3,7 @@ import { EarthquakeData, TsunamiData, WeatherData, ScreenType } from '../types';
 
 interface DisasterAlertsProps {
   onBack: () => void;
+  onNavigate?: (screen: ScreenType) => void;
 }
 
 const PREFECTURES = [
@@ -15,7 +16,7 @@ const PREFECTURES = [
   '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県'
 ];
 
-export const DisasterAlerts: React.FC<DisasterAlertsProps> = ({ onBack }) => {
+export const DisasterAlerts: React.FC<DisasterAlertsProps> = ({ onBack, onNavigate }) => {
   const [earthquake, setEarthquake] = useState<EarthquakeData | null>(null);
   const [earthquakeLoading, setEarthquakeLoading] = useState(false);
   const [earthquakeLastChecked, setEarthquakeLastChecked] = useState<string>('まだ確認していません');
@@ -408,6 +409,29 @@ export const DisasterAlerts: React.FC<DisasterAlertsProps> = ({ onBack }) => {
           </div>
         )}
       </div>
+
+      {/* ハザードマップへの直接リンク */}
+      {onNavigate && (
+        <div className="bg-gradient-to-r from-orange-500 to-amber-600 rounded-xl p-4 text-white shadow-md flex items-center justify-between gap-3">
+          <div className="space-y-0.5">
+            <div className="font-bold text-sm md:text-base flex items-center gap-1.5">
+              <span>🗺️</span>
+              <span>ハザードマップ・リスク確認</span>
+              <span className="text-2xs bg-white text-orange-700 px-2 py-0.5 rounded-full font-extrabold">NEW</span>
+            </div>
+            <p className="text-xs text-orange-100 m-0">
+              洪水想定・浸水深・土砂災害リスク・津波・海抜標高を地図で確認できます
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => onNavigate('hazard')}
+            className="shrink-0 px-3.5 py-2 bg-white text-orange-700 hover:bg-orange-50 font-bold rounded-lg text-xs md:text-sm shadow-xs transition-colors cursor-pointer"
+          >
+            マップを開く ↗
+          </button>
+        </div>
+      )}
 
       {/* ホームに戻る */}
       <button

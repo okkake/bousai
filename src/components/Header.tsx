@@ -22,6 +22,8 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate }) => 
         return { title: '👨‍👩‍👧 家族との連絡', subtitle: '集合場所などを確認する' };
       case 'quiz':
         return { title: '🧠 防災クイズ', subtitle: 'クイズで防災知識を学ぶ' };
+      case 'hazard':
+        return { title: '🗺️ ハザードマップ・リスク確認', subtitle: '浸水想定深・土砂災害・津波・標高と避難判定' };
       case 'home':
       default:
         return { title: '🚨 防災アプリ', subtitle: '災害から身を守るための情報を確認しよう' };

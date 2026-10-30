@@ -26,6 +26,12 @@ export const HomeMenu: React.FC<HomeMenuProps> = ({ onNavigate }) => {
       icon: '🏃',
     },
     {
+      id: 'hazard',
+      title: 'ハザードマップ・リスク確認',
+      desc: '洪水・浸水想定深・土砂災害・津波・海抜標高と避難判定',
+      icon: '🗺️',
+    },
+    {
       id: 'checklist',
       title: '防災チェック & 備蓄計算',
       desc: '持ち出し品チェック・家族の必要備蓄量をシミュレーション',
@@ -102,10 +108,20 @@ export const HomeMenu: React.FC<HomeMenuProps> = ({ onNavigate }) => {
           key={item.id}
           type="button"
           onClick={() => onNavigate(item.id)}
-          className="w-full p-5 bg-white rounded-xl text-left cursor-pointer shadow-md hover:bg-neutral-50 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-150 border border-neutral-100 flex flex-col justify-center focus-visible:outline-2 focus-visible:outline-[#d32f2f]"
+          className={`w-full p-5 rounded-xl text-left cursor-pointer shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all duration-150 flex flex-col justify-center focus-visible:outline-2 focus-visible:outline-[#d32f2f] relative ${
+            item.id === 'hazard'
+              ? 'bg-gradient-to-r from-orange-50/60 via-white to-amber-50/40 border-2 border-orange-300 hover:border-orange-400'
+              : 'bg-white border border-neutral-100 hover:bg-neutral-50'
+          }`}
         >
-          <span className="block text-xl font-bold text-neutral-800 mb-1">
-            {item.icon} {item.title}
+          {item.id === 'hazard' && (
+            <span className="absolute top-3.5 right-3.5 bg-orange-600 text-white text-2xs font-bold px-2 py-0.5 rounded-full shadow-2xs animate-pulse">
+              ✨ 新規追加
+            </span>
+          )}
+          <span className="block text-xl font-bold text-neutral-800 mb-1 flex items-center gap-1.5">
+            <span>{item.icon}</span>
+            <span>{item.title}</span>
           </span>
           <small className="text-sm text-neutral-500 font-normal">
             {item.desc}

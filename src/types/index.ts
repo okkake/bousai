@@ -2,6 +2,7 @@ export type ScreenType =
   | 'home'
   | 'alerts'
   | 'shelters'
+  | 'hazard'
   | 'checklist'
   | 'actions'
   | 'family'

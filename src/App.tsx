@@ -4,6 +4,7 @@ import { Header } from './components/Header';
 import { HomeMenu } from './components/HomeMenu';
 import { DisasterAlerts } from './components/DisasterAlerts';
 import { Shelters } from './components/Shelters';
+import { HazardMap } from './components/HazardMap';
 import { EmergencyChecklist } from './components/EmergencyChecklist';
 import { ActionGuidelines } from './components/ActionGuidelines';
 import { FamilyContact } from './components/FamilyContact';
@@ -58,6 +59,17 @@ export const App: React.FC = () => {
             </button>
             <button
               type="button"
+              onClick={() => handleNavigate('hazard')}
+              className={`py-1.5 px-2.5 rounded-md font-medium transition-colors cursor-pointer ${
+                currentScreen === 'hazard'
+                  ? 'bg-orange-50 text-[#e65100] font-bold'
+                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+              }`}
+            >
+              🗺️ ハザード
+            </button>
+            <button
+              type="button"
               onClick={() => handleNavigate('checklist')}
               className={`py-1.5 px-2.5 rounded-md font-medium transition-colors cursor-pointer ${
                 currentScreen === 'checklist'
@@ -107,8 +119,14 @@ export const App: React.FC = () => {
       {/* Main content */}
       <main className="flex-1">
         {currentScreen === 'home' && <HomeMenu onNavigate={handleNavigate} />}
-        {currentScreen === 'alerts' && <DisasterAlerts onBack={() => handleNavigate('home')} />}
+        {currentScreen === 'alerts' && (
+          <DisasterAlerts
+            onBack={() => handleNavigate('home')}
+            onNavigate={handleNavigate}
+          />
+        )}
         {currentScreen === 'shelters' && <Shelters onBack={() => handleNavigate('home')} />}
+        {currentScreen === 'hazard' && <HazardMap onBack={() => handleNavigate('home')} />}
         {currentScreen === 'checklist' && <EmergencyChecklist onBack={() => handleNavigate('home')} />}
         {currentScreen === 'actions' && <ActionGuidelines onBack={() => handleNavigate('home')} />}
         {currentScreen === 'family' && <FamilyContact onBack={() => handleNavigate('home')} />}
