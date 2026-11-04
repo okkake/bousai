@@ -559,7 +559,7 @@ export const EmergencyChecklist: React.FC<EmergencyChecklistProps> = ({ onBack }
       <button
         type="button"
         onClick={onBack}
-        className="w-full py-3.5 bg-neutral-600 hover:bg-neutral-700 text-white text-center rounded-lg font-bold transition-colors cursor-pointer shadow-sm block focus-visible:outline-2 focus-visible:outline-neutral-600"
+        className="w-full py-3 bg-neutral-900 hover:bg-neutral-800 text-white text-center rounded-xl font-bold transition-colors cursor-pointer shadow-2xs block focus-visible:outline-2 focus-visible:outline-neutral-900"
       >
         ← ホームに戻る
       </button>

@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { EarthquakeData, TsunamiData, WeatherData, ScreenType } from '../types';
+import { EarthquakeData, TsunamiData, WeatherData } from '../types';
 
 interface DisasterAlertsProps {
   onBack: () => void;
-  onNavigate?: (screen: ScreenType) => void;
 }
 
 const PREFECTURES = [
@@ -16,7 +15,7 @@ const PREFECTURES = [
   '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県'
 ];
 
-export const DisasterAlerts: React.FC<DisasterAlertsProps> = ({ onBack, onNavigate }) => {
+export const DisasterAlerts: React.FC<DisasterAlertsProps> = ({ onBack }) => {
   const [earthquake, setEarthquake] = useState<EarthquakeData | null>(null);
   const [earthquakeLoading, setEarthquakeLoading] = useState(false);
   const [earthquakeLastChecked, setEarthquakeLastChecked] = useState<string>('まだ確認していません');
@@ -211,16 +210,16 @@ export const DisasterAlerts: React.FC<DisasterAlertsProps> = ({ onBack, onNaviga
   };
 
   return (
-    <div className="w-[90%] max-w-[600px] mx-auto my-6 space-y-6">
+    <div className="w-[92%] max-w-[620px] mx-auto my-5 space-y-4">
       {/* ページ上部の危険度表示 */}
-      <div className={`p-4 rounded-xl text-center text-base md:text-lg font-bold shadow-md transition-colors ${overall.className}`}>
+      <div className={`p-3.5 rounded-2xl text-center text-sm md:text-base font-bold shadow-2xs transition-colors ${overall.className}`}>
         {overall.text}
       </div>
 
       {/* 地震情報 */}
-      <div className={`bg-white rounded-xl p-5 shadow-md border-y border-r border-neutral-100 ${getEarthquakeCardClass()}`}>
-        <h2 className="text-xl font-bold text-[#d32f2f] mb-3 flex items-center gap-2">
-          🟥 地震
+      <div className={`bg-white rounded-2xl p-5 shadow-2xs border border-neutral-200/90 ${getEarthquakeCardClass()}`}>
+        <h2 className="text-lg md:text-xl font-bold text-neutral-900 mb-3 flex items-center gap-2">
+          <span>地震情報</span>
         </h2>
 
         <div className="space-y-2 text-neutral-800 text-sm md:text-base">
@@ -242,7 +241,7 @@ export const DisasterAlerts: React.FC<DisasterAlertsProps> = ({ onBack, onNaviga
           </p>
         </div>
 
-        <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm md:text-base font-bold text-amber-900">
+        <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs md:text-sm font-bold text-amber-900">
           {getEarthquakeWarningText()}
         </div>
 
@@ -250,20 +249,20 @@ export const DisasterAlerts: React.FC<DisasterAlertsProps> = ({ onBack, onNaviga
           type="button"
           onClick={fetchEarthquake}
           disabled={earthquakeLoading}
-          className="w-full mt-4 py-3 px-4 bg-[#1976d2] hover:bg-[#1565c0] disabled:bg-neutral-400 text-white rounded-lg text-base font-bold cursor-pointer transition-colors shadow-sm focus-visible:outline-2 focus-visible:outline-[#1976d2]"
+          className="w-full mt-4 py-2.5 px-4 bg-neutral-900 hover:bg-neutral-800 disabled:bg-neutral-400 text-white rounded-xl text-sm md:text-base font-bold cursor-pointer transition-colors shadow-2xs focus-visible:outline-2 focus-visible:outline-neutral-900"
         >
           {earthquakeLoading ? '🔄 最新情報を確認中...' : '🔄 最新情報を確認'}
         </button>
 
-        <p className="text-center text-xs text-neutral-500 mt-2">
+        <p className="text-center text-2xs text-neutral-400 mt-2">
           最終確認：{earthquakeLastChecked}
         </p>
       </div>
 
       {/* 津波情報 */}
-      <div className="bg-white rounded-xl p-5 shadow-md border border-neutral-100 border-l-6 border-l-[#0088cc]">
-        <h2 className="text-xl font-bold text-[#0088cc] mb-3 flex items-center gap-2">
-          🌊 津波情報
+      <div className="bg-white rounded-2xl p-5 shadow-2xs border border-neutral-200/90">
+        <h2 className="text-lg md:text-xl font-bold text-neutral-900 mb-3 flex items-center gap-2">
+          <span>津波情報</span>
         </h2>
 
         <div className="space-y-2 text-neutral-800 text-sm md:text-base">
@@ -277,15 +276,15 @@ export const DisasterAlerts: React.FC<DisasterAlertsProps> = ({ onBack, onNaviga
           </p>
         </div>
 
-        <div className="mt-4 p-3 bg-sky-50 border border-sky-200 rounded-lg text-sm md:text-base font-bold text-sky-950">
+        <div className="mt-4 p-3 bg-sky-50 border border-sky-200 rounded-xl text-xs md:text-sm font-bold text-sky-950">
           {tsunami?.warning || '津波情報を確認しています'}
         </div>
       </div>
 
       {/* 気象警報・注意報 */}
-      <div className={`bg-white rounded-xl p-5 shadow-md border-y border-r border-neutral-100 relative ${getWeatherCardClass()}`}>
-        <h2 className="text-xl font-bold text-[#d32f2f] flex items-center gap-2 mb-4">
-          🌧️ 気象警報・注意報
+      <div className={`bg-white rounded-2xl p-5 shadow-2xs border border-neutral-200/90 relative ${getWeatherCardClass()}`}>
+        <h2 className="text-lg md:text-xl font-bold text-neutral-900 flex items-center gap-2 mb-4">
+          <span>気象警報・注意報</span>
         </h2>
 
         {/* 都道府県・発表状況・対象地域・発表内容（左側）と 警報レベル凡例（右側） */}
@@ -410,34 +409,11 @@ export const DisasterAlerts: React.FC<DisasterAlertsProps> = ({ onBack, onNaviga
         )}
       </div>
 
-      {/* ハザードマップへの直接リンク */}
-      {onNavigate && (
-        <div className="bg-gradient-to-r from-orange-500 to-amber-600 rounded-xl p-4 text-white shadow-md flex items-center justify-between gap-3">
-          <div className="space-y-0.5">
-            <div className="font-bold text-sm md:text-base flex items-center gap-1.5">
-              <span>🗺️</span>
-              <span>ハザードマップ・リスク確認</span>
-              <span className="text-2xs bg-white text-orange-700 px-2 py-0.5 rounded-full font-extrabold">NEW</span>
-            </div>
-            <p className="text-xs text-orange-100 m-0">
-              洪水想定・浸水深・土砂災害リスク・津波・海抜標高を地図で確認できます
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => onNavigate('hazard')}
-            className="shrink-0 px-3.5 py-2 bg-white text-orange-700 hover:bg-orange-50 font-bold rounded-lg text-xs md:text-sm shadow-xs transition-colors cursor-pointer"
-          >
-            マップを開く ↗
-          </button>
-        </div>
-      )}
-
       {/* ホームに戻る */}
       <button
         type="button"
         onClick={onBack}
-        className="w-full py-3.5 bg-neutral-600 hover:bg-neutral-700 text-white text-center rounded-lg font-bold transition-colors cursor-pointer shadow-sm block focus-visible:outline-2 focus-visible:outline-neutral-600"
+        className="w-full py-3 bg-neutral-900 hover:bg-neutral-800 text-white text-center rounded-xl font-bold transition-colors cursor-pointer shadow-2xs block focus-visible:outline-2 focus-visible:outline-neutral-900"
       >
         ← ホームに戻る
       </button>

@@ -1,71 +1,121 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   Base Layer - 全体基本設定
+   ========================================================================== */
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     margin: 0;
-    padding-bottom: 40px;
+    padding-bottom: 32px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
-    background-color: #f2f5f7;
-    color: #222222;
+    background-color: #f8fafc;
+    color: #1e293b;
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* 入力欄のiOS自動ズーム抑止（16px以上確保） */
+  input, select, textarea {
+    font-size: 16px;
+  }
+  @media (min-width: 640px) {
+    input, select, textarea {
+      font-size: 14px;
+    }
   }
 }
 
-/* Custom disaster card borders */
+/* ==========================================================================
+   Utilities - スクロールバー非表示・アクセシビリティ
+   ========================================================================== */
+/* 横スクロールタブ用（スクロールバーを隠してスッキリ見せる） */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* タップフィードバック */
+.tap-highlight {
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+.tap-highlight:active {
+  transform: scale(0.98);
+}
+
+/* ==========================================================================
+   Disaster Status Indicators - 災害ステータス別スタイル（警戒レベル準拠）
+   ========================================================================== */
+
+/* 地震情報カードの状態別スタイル */
 .earthquake-safe {
-  border-left: 6px solid #28a745;
+  border: 1px solid #e2e8f0;
 }
 .earthquake-yellow {
-  border-left: 6px solid #ffc107;
+  border: 1px solid #fef08a;
+  background-color: #fefce8;
 }
 .earthquake-orange {
-  border-left: 6px solid #ff6600;
+  border: 1px solid #fed7aa;
+  background-color: #fff7ed;
 }
 .earthquake-red {
-  border-left: 6px solid #dc3545;
+  border: 1px solid #fecaca;
+  background-color: #fef2f2;
 }
 .earthquake-emergency {
-  border-left: 6px solid #8b0000;
+  border: 2px solid #ef4444;
+  background-color: #fef2f2;
 }
 
+/* 気象警報・注意報カードの状態別スタイル */
 .weather-safe {
-  border-left: 6px solid #28a745;
+  border: 1px solid #e2e8f0;
 }
 .weather-warning {
-  border-left: 6px solid #ffc107;
+  border: 1px solid #fde68a;
 }
 .weather-danger {
-  border-left: 6px solid #dc3545;
+  border: 1px solid #fecaca;
 }
 .weather-critical {
-  border-left: 6px solid #8000cc;
+  border: 1px solid #e9d5ff;
 }
 .weather-emergency {
-  border-left: 6px solid #040202;
+  border: 2px solid #1e1b4b;
 }
 
+/* 総合危険度バナー（警戒レベル色） */
 .overall-safe {
-  background-color: #dff5e1;
-  border: 3px solid #28a745;
-  color: #176b2c;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
 }
 .overall-warning {
-  background-color: #fff3cd;
-  border: 3px solid #ffc107;
-  color: #856404;
+  background-color: #fefce8;
+  border: 1px solid #fef08a;
+  color: #854d0e;
 }
 .overall-danger {
-  background-color: #ffe0cc;
-  border: 3px solid #ff6600;
-  color: #b34700;
+  background-color: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #9a3412;
 }
 .overall-critical {
-  background-color: #ead6f7;
-  border: 3px solid #8000cc;
-  color: #5a008f;
+  background-color: #faf5ff;
+  border: 1px solid #e9d5ff;
+  color: #6b21a8;
 }
 .overall-emergency {
-  background-color: #ffdddd;
-  border: 3px solid #dc3545;
-  color: #b00000;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
 }

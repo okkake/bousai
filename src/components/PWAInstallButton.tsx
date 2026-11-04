@@ -19,9 +19,9 @@ export const PWAInstallButton: React.FC = () => {
   // すでにPWA（ホーム画面からスタンドアロン起動中）なら完了バッジを表示
   if (isInstalled) {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 text-white px-2.5 py-1 text-xs font-bold border border-white/30">
-        <span>✅</span>
-        <span>アプリ版で起動中</span>
+      <span className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 text-emerald-800 px-2.5 py-1 text-xs font-semibold border border-emerald-200">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+        <span>インストール済</span>
       </span>
     );
   }
@@ -31,9 +31,9 @@ export const PWAInstallButton: React.FC = () => {
       <button
         type="button"
         onClick={handleClick}
-        className="inline-flex items-center gap-1.5 rounded-lg bg-white/25 hover:bg-white/35 active:scale-95 text-white px-3 py-1.5 text-xs font-bold border border-white/50 shadow-xs transition-all cursor-pointer whitespace-nowrap"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-white hover:bg-neutral-50 active:scale-95 text-neutral-800 px-3 py-1.5 text-xs font-semibold border border-neutral-200 shadow-2xs transition-all cursor-pointer whitespace-nowrap"
       >
-        <span>📲</span>
+        <span className="text-neutral-500">📲</span>
         <span>{isInstallable ? 'アプリを保存' : 'ホーム画面に追加'}</span>
       </button>
 

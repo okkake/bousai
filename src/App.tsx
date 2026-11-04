@@ -20,110 +20,111 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f2f5f7]">
-      <Header currentScreen={currentScreen} onNavigate={handleNavigate} />
+    <div className="min-h-screen flex flex-col bg-[#f8fafc] text-neutral-800 font-sans">
+      {/* Sticky Header & Navigation Container */}
+      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-neutral-200/90 shadow-2xs">
+        <Header currentScreen={currentScreen} onNavigate={handleNavigate} />
 
-      {/* Screen navigation tabs when in subscreen */}
-      {currentScreen !== 'home' && (
-        <div className="bg-white border-b border-neutral-200 overflow-x-auto shadow-xs">
-          <div className="max-w-[600px] mx-auto px-4 py-2 flex items-center gap-2 text-xs md:text-sm whitespace-nowrap">
-            <button
-              type="button"
-              onClick={() => handleNavigate('home')}
-              className="py-1.5 px-2.5 rounded-md text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 font-medium transition-colors cursor-pointer"
-            >
-              🏠 ホーム
-            </button>
-            <span className="text-neutral-300">/</span>
-            <button
-              type="button"
-              onClick={() => handleNavigate('alerts')}
-              className={`py-1.5 px-2.5 rounded-md font-medium transition-colors cursor-pointer ${
-                currentScreen === 'alerts'
-                  ? 'bg-red-50 text-[#d32f2f] font-bold'
-                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-              }`}
-            >
-              🚨 災害速報
-            </button>
-            <button
-              type="button"
-              onClick={() => handleNavigate('shelters')}
-              className={`py-1.5 px-2.5 rounded-md font-medium transition-colors cursor-pointer ${
-                currentScreen === 'shelters'
-                  ? 'bg-blue-50 text-[#1976d2] font-bold'
-                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-              }`}
-            >
-              🏃 避難場所
-            </button>
-            <button
-              type="button"
-              onClick={() => handleNavigate('hazard')}
-              className={`py-1.5 px-2.5 rounded-md font-medium transition-colors cursor-pointer ${
-                currentScreen === 'hazard'
-                  ? 'bg-orange-50 text-[#e65100] font-bold'
-                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-              }`}
-            >
-              🗺️ ハザード
-            </button>
-            <button
-              type="button"
-              onClick={() => handleNavigate('checklist')}
-              className={`py-1.5 px-2.5 rounded-md font-medium transition-colors cursor-pointer ${
-                currentScreen === 'checklist'
-                  ? 'bg-emerald-50 text-[#28a745] font-bold'
-                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-              }`}
-            >
-              🎒 チェック
-            </button>
-            <button
-              type="button"
-              onClick={() => handleNavigate('actions')}
-              className={`py-1.5 px-2.5 rounded-md font-medium transition-colors cursor-pointer ${
-                currentScreen === 'actions'
-                  ? 'bg-amber-50 text-amber-700 font-bold'
-                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-              }`}
-            >
-              📖 行動
-            </button>
-            <button
-              type="button"
-              onClick={() => handleNavigate('family')}
-              className={`py-1.5 px-2.5 rounded-md font-medium transition-colors cursor-pointer ${
-                currentScreen === 'family'
-                  ? 'bg-indigo-50 text-indigo-700 font-bold'
-                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-              }`}
-            >
-              👨‍👩‍👧 家族
-            </button>
-            <button
-              type="button"
-              onClick={() => handleNavigate('quiz')}
-              className={`py-1.5 px-2.5 rounded-md font-medium transition-colors cursor-pointer ${
-                currentScreen === 'quiz'
-                  ? 'bg-purple-50 text-purple-700 font-bold'
-                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-              }`}
-            >
-              🧠 クイズ
-            </button>
+        {/* Screen navigation tabs when in subscreen */}
+        {currentScreen !== 'home' && (
+          <div className="border-t border-neutral-100 overflow-x-auto no-scrollbar scroll-smooth">
+            <div className="max-w-[640px] mx-auto px-3 py-1.5 flex items-center gap-1.5 text-xs whitespace-nowrap">
+              <button
+                type="button"
+                onClick={() => handleNavigate('home')}
+                className="py-1 px-2.5 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 font-medium transition-colors cursor-pointer flex items-center gap-1"
+              >
+                <span>←</span>
+                <span>ホーム</span>
+              </button>
+              <span className="text-neutral-300">|</span>
+              <button
+                type="button"
+                onClick={() => handleNavigate('alerts')}
+                className={`py-1 px-2.5 rounded-lg font-semibold transition-colors cursor-pointer ${
+                  currentScreen === 'alerts'
+                    ? 'bg-red-600 text-white shadow-2xs'
+                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                }`}
+              >
+                災害速報
+              </button>
+              <button
+                type="button"
+                onClick={() => handleNavigate('shelters')}
+                className={`py-1 px-2.5 rounded-lg font-semibold transition-colors cursor-pointer ${
+                  currentScreen === 'shelters'
+                    ? 'bg-blue-600 text-white shadow-2xs'
+                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                }`}
+              >
+                避難場所
+              </button>
+              <button
+                type="button"
+                onClick={() => handleNavigate('hazard')}
+                className={`py-1 px-2.5 rounded-lg font-semibold transition-colors cursor-pointer ${
+                  currentScreen === 'hazard'
+                    ? 'bg-amber-600 text-white shadow-2xs'
+                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                }`}
+              >
+                ハザードマップ
+              </button>
+              <button
+                type="button"
+                onClick={() => handleNavigate('checklist')}
+                className={`py-1 px-2.5 rounded-lg font-semibold transition-colors cursor-pointer ${
+                  currentScreen === 'checklist'
+                    ? 'bg-emerald-600 text-white shadow-2xs'
+                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                }`}
+              >
+                チェック
+              </button>
+              <button
+                type="button"
+                onClick={() => handleNavigate('actions')}
+                className={`py-1 px-2.5 rounded-lg font-semibold transition-colors cursor-pointer ${
+                  currentScreen === 'actions'
+                    ? 'bg-indigo-600 text-white shadow-2xs'
+                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                }`}
+              >
+                行動マニュアル
+              </button>
+              <button
+                type="button"
+                onClick={() => handleNavigate('family')}
+                className={`py-1 px-2.5 rounded-lg font-semibold transition-colors cursor-pointer ${
+                  currentScreen === 'family'
+                    ? 'bg-violet-600 text-white shadow-2xs'
+                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                }`}
+              >
+                家族連絡
+              </button>
+              <button
+                type="button"
+                onClick={() => handleNavigate('quiz')}
+                className={`py-1 px-2.5 rounded-lg font-semibold transition-colors cursor-pointer ${
+                  currentScreen === 'quiz'
+                    ? 'bg-teal-600 text-white shadow-2xs'
+                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                }`}
+              >
+                クイズ
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Main content */}
       <main className="flex-1">
         {currentScreen === 'home' && <HomeMenu onNavigate={handleNavigate} />}
         {currentScreen === 'alerts' && (
-          <DisasterAlerts
-            onBack={() => handleNavigate('home')}
-            onNavigate={handleNavigate}
-          />
+          <DisasterAlerts onBack={() => handleNavigate('home')} />
         )}
         {currentScreen === 'shelters' && <Shelters onBack={() => handleNavigate('home')} />}
         {currentScreen === 'hazard' && <HazardMap onBack={() => handleNavigate('home')} />}
@@ -136,16 +137,16 @@ export const App: React.FC = () => {
       {/* Offline Status Toast */}
       <OfflineIndicator />
 
-      {/* Emergency telephone contacts footer */}
-      <footer className="mt-auto py-6 border-t border-neutral-200 text-center text-xs text-neutral-500 bg-white/70">
-        <div className="max-w-[600px] mx-auto px-4 space-y-2">
-          <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-1 text-neutral-600 font-medium">
-            <span>📞 災害用伝言ダイヤル: 171</span>
-            <span>🚒 消防・救急: 119</span>
-            <span>🚓 警察: 110</span>
+      {/* Footer */}
+      <footer className="mt-auto py-5 border-t border-neutral-200/80 text-center text-xs text-neutral-500 bg-white">
+        <div className="max-w-[620px] mx-auto px-4 space-y-1.5">
+          <div className="flex items-center justify-center gap-2 font-medium text-neutral-600">
+            <span className="font-bold text-neutral-900">SafeNow</span>
+            <span>·</span>
+            <span>セーフナウ 総合防災ナビ</span>
           </div>
-          <p className="m-0 text-neutral-400">
-            データ出典：気象庁（JMA）防災情報XML / 国土地理院地図
+          <p className="m-0 text-2xs text-neutral-400">
+            データ出典：気象庁（JMA）防災情報XML · 国土交通省 重ねるハザードマップ · 国土地理院地図
           </p>
         </div>
       </footer>

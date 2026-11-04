@@ -49,26 +49,26 @@ export const ActionGuidelines: React.FC<ActionGuidelinesProps> = ({ onBack }) =>
   ];
 
   return (
-    <div className="w-[90%] max-w-[600px] mx-auto my-6 space-y-6">
-      <div className="bg-white rounded-xl p-5 shadow-md border border-neutral-100 space-y-4">
-        <h2 className="text-xl font-bold text-[#d32f2f] flex items-center gap-2">
-          🚨 災害が起きたら
+    <div className="w-[92%] max-w-[620px] mx-auto my-5 space-y-4">
+      <div className="bg-white rounded-2xl p-5 shadow-2xs border border-neutral-200/90 space-y-4">
+        <h2 className="text-lg md:text-xl font-bold text-neutral-900 flex items-center gap-2">
+          <span>災害時の行動マニュアル</span>
         </h2>
 
-        <p className="text-sm md:text-base text-neutral-700 leading-relaxed">
-          災害の種類によって、取るべき行動が変わります。落ち着いて安全を確保しましょう。
+        <p className="text-xs md:text-sm text-neutral-500 leading-relaxed m-0">
+          災害の種類によって、取るべき行動が変わります。落ち着いて安全を最優先に確保しましょう。
         </p>
 
-        <div className="space-y-4 pt-2">
+        <div className="space-y-3 pt-1">
           {actions.map((action, idx) => (
             <div
               key={idx}
-              className={`p-4 bg-neutral-50 rounded-lg border-l-6 ${action.borderColor} border border-neutral-200 shadow-xs`}
+              className="p-4 bg-neutral-50/80 rounded-xl border border-neutral-200/80 space-y-2"
             >
-              <h3 className="text-base md:text-lg font-bold text-neutral-800 m-0 mb-2">
+              <h3 className="text-base font-bold text-neutral-900 m-0">
                 {action.title}
               </h3>
-              <ol className="list-decimal pl-5 space-y-1.5 text-sm md:text-base text-neutral-700">
+              <ol className="list-decimal pl-5 space-y-1 text-xs md:text-sm text-neutral-700">
                 {action.steps.map((step, sIdx) => (
                   <li key={sIdx} className="leading-relaxed">
                     {step}
@@ -84,7 +84,7 @@ export const ActionGuidelines: React.FC<ActionGuidelinesProps> = ({ onBack }) =>
       <button
         type="button"
         onClick={onBack}
-        className="w-full py-3.5 bg-neutral-600 hover:bg-neutral-700 text-white text-center rounded-lg font-bold transition-colors cursor-pointer shadow-sm block focus-visible:outline-2 focus-visible:outline-neutral-600"
+        className="w-full py-3 bg-neutral-900 hover:bg-neutral-800 text-white text-center rounded-xl font-bold transition-colors cursor-pointer shadow-2xs block focus-visible:outline-2 focus-visible:outline-neutral-900"
       >
         ← ホームに戻る
       </button>
