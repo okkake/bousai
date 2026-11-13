@@ -1,9 +1,20 @@
 import React, { useState, useCallback, useMemo } from 'react';
+import {
+  HazardMapIcon,
+  LocationPinIcon,
+  InfoIcon,
+  SearchIcon,
+  MapFoldIcon,
+  RefreshIcon,
+  RainIcon,
+  EarthquakeIcon,
+  HomeIcon,
+  WarningIcon,
+} from './Icons';
 
 interface HazardMapProps {
   onBack: () => void;
 }
-
 
 interface RiskDiagnosis {
   buildingType: 'wood_house' | 'steel_house' | 'rc_mansion';
@@ -150,7 +161,6 @@ export const HazardMap: React.FC<HazardMapProps> = ({ onBack }) => {
 
   // 国土交通省 重ねるハザードマップ（disaportal.gsi.go.jp）URL生成
   const { embedUrl, externalUrl } = useMemo(() => {
-    // 洪水（想定最大規模・計画規模）＋土砂災害警戒区域（急傾斜・土石流・地すべり）＋津波浸水想定を重ね合わせて表示
     const layerList = [
       'flood_list_l2,0.8',
       'flood_list,0.8',
@@ -189,12 +199,12 @@ export const HazardMap: React.FC<HazardMapProps> = ({ onBack }) => {
 
     if (sedimentZone === 'yellow') {
       return {
-        level: 'warning',
-        badge: '事前立退き避難を推奨',
-        color: 'bg-amber-600 text-white',
-        border: 'border-amber-500 bg-amber-50',
-        action: '大雨警報や警戒レベル3が発表された段階で、明るいうちに安全な場所へ避難してください。',
-        reason: '土砂災害警戒区域（イエローゾーン）は土石流やがけ崩れが到達する恐れがあります。夜間や豪雨ピーク時の避難は危険なため、早めの立ち退きが原則です。',
+        level: 'danger',
+        badge: '早期の立退き避難を強く推奨',
+        color: 'bg-orange-600 text-white',
+        border: 'border-orange-500 bg-orange-50',
+        action: '崖や斜面から離れた2階以上の部屋に待避するか、大雨が激しくなる前に安全な避難所へ移動してください。',
+        reason: '土砂災害警戒区域（イエローゾーン）では、土石流やがけ崩れの恐れがあります。夜間の外出は危険を伴うため明るいうちの移動が鉄則です。',
       };
     }
 
@@ -250,33 +260,36 @@ export const HazardMap: React.FC<HazardMapProps> = ({ onBack }) => {
     if (floodDepth === 'shallow') {
       return {
         level: 'safe',
-        badge: '自宅待機・垂直避難で安全確保',
+        badge: '自宅2階待避または警戒待機',
         color: 'bg-emerald-600 text-white',
         border: 'border-emerald-500 bg-emerald-50',
-        action: '床下浸水や道路冠水の恐れがありますが、自宅上階で待避可能です。排水溝の逆流や側溝への転落に注意してください。',
-        reason: '0.5m未満の浸水深であれば、建物倒壊や溺水のリスクは極めて低いです。無理に浸水した道路へ出るより自宅待機が安全です。',
+        action: '床下浸水の恐れがあります。貴重品や電化製品を少し高い場所に移動し、外出を控えて最新の気象情報を確認してください。',
+        reason: '0.5m未満の浸水では建物倒壊の危険は低いため、むやみな外出よりも屋内での待機が推奨されます。',
       };
     }
 
-    // 5. 浸水・土砂想定なし
+    // 5. 浸水想定なし
     return {
       level: 'safe',
-      badge: '在宅避難（自宅待避）が基本',
-      color: 'bg-emerald-700 text-white',
+      badge: '自宅待機可能（想定浸水深なし）',
+      color: 'bg-emerald-600 text-white',
       border: 'border-emerald-500 bg-emerald-50',
-      action: '現在の場所は主要な水害・土砂災害の危険区域外です。自宅が倒壊・延焼する危険がない限り、在宅避難を継続してください。',
-      reason: '避難所の過密を防ぐためにも、ハザードマップで安全な地域に住んでいる方は、備蓄を用意して自宅で安全を確保することが推奨されています。',
+      action: '現在の想定では直接の水没リスクは低いです。河川水位の増水や周辺道路の冠水に注意し、最新の警戒レベルを注視してください。',
+      reason: '浸水想定・土砂災害区域外ですが、想定を超える未曾有の豪雨時には周囲の排水溝の溢水（内水氾濫）に注意が必要です。',
     };
   };
 
   const evalResult = evaluateEvacuation();
 
   return (
-    <div className="w-[92%] max-w-[620px] mx-auto my-5 space-y-4">
+    <div className="w-[94%] max-w-5xl mx-auto my-5 md:my-6 space-y-4 md:space-y-5">
       {/* メインカード */}
-      <div className="bg-white rounded-2xl p-5 shadow-2xs border border-neutral-200/90">
+      <div className="bg-white rounded-2xl p-5 md:p-6 shadow-2xs border border-neutral-200/90">
         <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
-          <h2 className="text-lg md:text-xl font-bold text-neutral-900 flex items-center gap-2 m-0">
+          <h2 className="text-lg md:text-xl font-bold text-neutral-900 flex items-center gap-3 m-0">
+            <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shrink-0 shadow-2xs">
+              <HazardMapIcon className="w-5 h-5 text-amber-600" />
+            </div>
             <span>ハザードマップ・リスク確認</span>
           </h2>
           <span className="text-2xs text-neutral-500 font-medium">国土交通省・国土地理院連携</span>
@@ -293,19 +306,21 @@ export const HazardMap: React.FC<HazardMapProps> = ({ onBack }) => {
           disabled={isLocating}
           className="w-full py-3 px-4 bg-[#e65100] hover:bg-[#ef6c00] text-white rounded-lg text-sm md:text-base font-bold cursor-pointer transition-colors shadow-2xs flex items-center justify-center gap-2 disabled:opacity-50"
         >
-          <span>{isLocating ? '📍 現在地・標高を取得中...' : '📍 現在地でハザードマップを確認'}</span>
+          <LocationPinIcon className="w-4 h-4 shrink-0 text-white" />
+          <span>{isLocating ? '現在地・標高を取得中...' : '現在地でハザードマップを確認'}</span>
         </button>
 
         {/* 状態・案内メッセージ */}
         <div className="mt-3 p-3 bg-neutral-50 rounded-lg text-xs md:text-sm text-neutral-700 flex items-start gap-2 border border-neutral-200">
-          <span className="shrink-0 mt-0.5">ℹ️</span>
+          <InfoIcon className="w-4 h-4 text-neutral-500 shrink-0 mt-0.5" />
           <span className="leading-relaxed">{locationMsg}</span>
         </div>
 
         {/* 手動検索 */}
         <div className="mt-4 p-3.5 bg-neutral-50 rounded-xl border border-neutral-200 space-y-2.5">
-          <label htmlFor="hazard-search" className="block text-xs font-bold text-neutral-800">
-            🔍 市区町村名や駅名で検索
+          <label htmlFor="hazard-search" className="block text-xs font-bold text-neutral-800 flex items-center gap-1.5">
+            <SearchIcon className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
+            <span>市区町村名や駅名で検索</span>
           </label>
           <form onSubmit={handleSearch} className="flex gap-2">
             <input
@@ -337,10 +352,11 @@ export const HazardMap: React.FC<HazardMapProps> = ({ onBack }) => {
                     setSearchQuery(item.query);
                     handleSearch(undefined, item.query);
                   }}
-                  className="py-1 px-2 bg-white border border-neutral-300 hover:border-[#e65100] hover:text-[#e65100] rounded-md text-2xs md:text-xs text-neutral-700 transition-colors cursor-pointer"
+                  className="py-1 px-2 bg-white border border-neutral-300 hover:border-[#e65100] hover:text-[#e65100] rounded-md text-2xs md:text-xs text-neutral-700 transition-colors cursor-pointer flex items-center gap-1"
                   title={item.desc}
                 >
-                  📍 {item.label}
+                  <LocationPinIcon className="w-3 h-3 text-neutral-500 shrink-0" />
+                  <span>{item.label}</span>
                 </button>
               ))}
             </div>
@@ -348,36 +364,30 @@ export const HazardMap: React.FC<HazardMapProps> = ({ onBack }) => {
         </div>
 
         {/* 現在の表示地点 & 標高・海抜メーター */}
-        <div className="mt-4 p-4 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 rounded-xl space-y-3">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <div className="text-2xs font-bold text-amber-800 uppercase tracking-wide">対象地点</div>
-              <div className="font-bold text-sm md:text-base text-neutral-900 leading-snug">
+        <div className="mt-4 p-4 rounded-xl border-2 border-amber-400 bg-amber-50/50 space-y-2.5">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <span className="text-xs font-bold text-amber-900 block">対象地点</span>
+              <div className="font-extrabold text-sm md:text-base text-neutral-900 truncate">
                 {locationName}
               </div>
-              <div className="text-2xs text-neutral-500 mt-0.5">
+              <div className="text-2xs text-neutral-500 font-mono mt-0.5">
                 緯度: {lat.toFixed(4)}° / 経度: {lng.toFixed(4)}°
               </div>
             </div>
 
-            {/* 標高バッジ */}
-            <div className="shrink-0 text-right bg-white px-3 py-2 rounded-xl border border-amber-300 shadow-2xs">
-              <div className="text-2xs text-neutral-500 font-medium">海抜（標高）</div>
-              <div className="text-lg md:text-xl font-black text-[#e65100] flex items-baseline justify-end gap-0.5">
-                <span>{elevation !== null ? elevation : '---'}</span>
-                <span className="text-xs text-neutral-700 font-normal">m</span>
+            <div className="bg-white px-3 py-2 rounded-xl border border-amber-200 text-center shrink-0">
+              <span className="text-2xs text-neutral-500 block font-bold">海抜（標高）</span>
+              <div className="text-2xl font-black text-[#e65100] font-mono leading-none mt-0.5">
+                {elevation !== null ? elevation : '---'}
+                <span className="text-xs text-neutral-500 font-normal ml-0.5">m</span>
               </div>
-              {elevation !== null && elevation <= 0 && (
-                <span className="text-2xs bg-red-600 text-white px-1.5 py-0.2 rounded font-bold inline-block mt-0.5 animate-pulse">
-                  海抜ゼロm地帯
-                </span>
-              )}
             </div>
           </div>
 
-          {elevation !== null && elevation <= 3 && (
-            <div className="p-2 bg-red-100 border border-red-300 rounded-lg text-xs text-red-900 font-medium flex items-center gap-1.5">
-              <span>⚠️</span>
+          {elevation !== null && elevation <= 3.0 && (
+            <div className="p-2.5 bg-red-50 border border-red-200 rounded-lg text-xs text-red-950 font-medium flex items-start gap-1.5 leading-relaxed">
+              <WarningIcon className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
               <span>
                 <strong>低地・ゼロメートル警戒：</strong>
                 海抜3m以下の低地帯です。高潮・津波・大河川氾濫時の浸水深が大きくなりやすい地形です。
@@ -390,7 +400,7 @@ export const HazardMap: React.FC<HazardMapProps> = ({ onBack }) => {
         <div className="mt-5 space-y-3">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <span className="font-bold text-xs md:text-sm text-neutral-900 flex items-center gap-1.5">
-              <span>🗺️</span>
+              <MapFoldIcon className="w-4 h-4 text-neutral-700 shrink-0" />
               <span>国土交通省 重ねるハザードマップ</span>
             </span>
             <button
@@ -399,7 +409,7 @@ export const HazardMap: React.FC<HazardMapProps> = ({ onBack }) => {
               className="px-2.5 py-1 bg-neutral-100 hover:bg-neutral-200 rounded-md font-bold text-xs flex items-center gap-1 cursor-pointer text-neutral-700 border border-neutral-300"
               title="地図を再読み込み"
             >
-              <span>🔄</span>
+              <RefreshIcon className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
               <span>再読み込み</span>
             </button>
           </div>
@@ -410,27 +420,28 @@ export const HazardMap: React.FC<HazardMapProps> = ({ onBack }) => {
               key={iframeKey}
               title="国土交通省 重ねるハザードマップ"
               src={embedUrl}
-              className="w-full h-[360px] md:h-[420px] border-none"
+              className="w-full h-[380px] sm:h-[460px] md:h-[520px] border-none"
               loading="lazy"
             />
             {/* 地図中央ピンインジケーター */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full pointer-events-none drop-shadow-md z-10">
-              <span className="text-3xl">📍</span>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full pointer-events-none drop-shadow-md z-10 flex flex-col items-center">
+              <LocationPinIcon className="w-8 h-8 text-red-600 drop-shadow-md" />
             </div>
           </div>
 
           {/* 重ねるハザードマップの凡例ガイド */}
           <div className="p-3 bg-neutral-50 border border-neutral-200 rounded-xl space-y-2 text-xs">
             <div className="font-bold text-neutral-800 flex items-center justify-between">
-              <span>🎨 地図の色の見方（凡例）：</span>
+              <span>地図の色の見方（凡例）：</span>
               <span className="text-2xs text-neutral-500">国土交通省 統一規格</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-2xs md:text-xs">
               {/* 洪水凡例 */}
               <div className="space-y-1 bg-white p-2 rounded-lg border border-neutral-200">
-                <div className="font-bold text-blue-900 border-b border-neutral-100 pb-0.5">
-                  🌊 洪水浸水想定区域（浸水深）
+                <div className="font-bold text-blue-900 border-b border-neutral-100 pb-0.5 flex items-center gap-1.5">
+                  <RainIcon className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                  <span>洪水浸水想定区域（浸水深）</span>
                 </div>
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-1.5">
@@ -452,71 +463,47 @@ export const HazardMap: React.FC<HazardMapProps> = ({ onBack }) => {
                 </div>
               </div>
 
-              {/* 土砂凡例 */}
+              {/* 土砂災害凡例 */}
               <div className="space-y-1 bg-white p-2 rounded-lg border border-neutral-200">
-                <div className="font-bold text-red-900 border-b border-neutral-100 pb-0.5">
-                  ⛰️ 土砂災害警戒区域
+                <div className="font-bold text-amber-900 border-b border-neutral-100 pb-0.5 flex items-center gap-1.5">
+                  <EarthquakeIcon className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                  <span>土砂災害警戒区域</span>
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   <div className="flex items-center gap-1.5">
-                    <span className="w-3.5 h-3.5 bg-[#d32f2f] rounded-xs shrink-0"></span>
-                    <span><strong>特別警戒区域（レッド）：</strong> 建物倒壊・生命に危険</span>
+                    <span className="w-3.5 h-3.5 bg-[#ff0000] rounded-xs shrink-0"></span>
+                    <span><strong>特別警戒区域（レッド）：</strong> 建物倒壊・生命に著しい危害</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-3.5 h-3.5 bg-[#fbc02d] rounded-xs shrink-0"></span>
-                    <span><strong>警戒区域（イエロー）：</strong> 土石流・がけ崩れ警戒</span>
+                    <span className="w-3.5 h-3.5 bg-[#ffcc00] rounded-xs shrink-0"></span>
+                    <span><strong>警戒区域（イエロー）：</strong> 土石流・急傾斜地崩壊の恐れ</span>
                   </div>
-                  <div className="text-2xs text-neutral-500 pt-0.5 leading-tight">
-                    ※赤・黄色の着色エリアにいる場合は大雨前に立ち退き避難が必要です。
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-3.5 h-3.5 bg-[#0088cc] rounded-xs shrink-0"></span>
+                    <span><strong>津波浸水想定：</strong> 津波による浸水深</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* 国交省 重ねるハザードマップ（全画面ポータル直通リンク） */}
-          <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl space-y-2">
-            <div className="text-xs text-blue-900 font-bold flex items-center justify-between">
-              <span className="flex items-center gap-1.5">
-                <span>🏛️</span>
-                <span>国土交通省「重ねるハザードマップ」公式ポータル</span>
-              </span>
-            </div>
-            <p className="text-xs text-neutral-600 m-0 leading-relaxed">
-              全画面でさらに広い範囲の印刷用ハザードマップや、詳細な避難施設・道路防災情報を閲覧できます。
-            </p>
-            <a
-              href={externalUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="py-2.5 px-4 bg-[#1976d2] hover:bg-[#1565c0] text-white text-center font-bold rounded-lg text-xs md:text-sm block shadow-2xs transition-colors"
-            >
-              🌐 重ねるハザードマップを別タブ全画面で開く ↗
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* わが家の避難判定シミュレーター */}
-      <div className="bg-white rounded-2xl p-5 shadow-2xs border border-neutral-200/90 space-y-4">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">🏠</span>
-          <div>
-            <h2 className="text-lg md:text-xl font-bold text-neutral-900 m-0">
-              わが家の避難判定シミュレーター
-            </h2>
-            <p className="text-xs text-neutral-500 m-0">
-              住まいの条件から「在宅垂直避難」か「事前立退き避難」かを自動判定
-            </p>
-          </div>
         </div>
 
-        {/* 診断入力フォーム */}
-        <div className="space-y-3 bg-neutral-50 p-4 rounded-xl border border-neutral-200 text-xs md:text-sm">
-          {/* 1. 建物の構造 */}
+        {/* 避難判定シミュレーター */}
+        <div className="mt-5 p-4 rounded-xl border border-neutral-200 bg-neutral-50/70 space-y-3.5">
           <div>
-            <label className="font-bold text-neutral-800 block mb-1.5">
-              1. お住まいの建物構造
+            <h3 className="font-bold text-sm md:text-base text-neutral-900 m-0 flex items-center gap-1.5">
+              <HomeIcon className="w-4 h-4 text-neutral-700 shrink-0" />
+              <span>自宅にとどまれる？避難判定シミュレーター</span>
+            </h3>
+            <p className="text-2xs md:text-xs text-neutral-600 m-0 mt-0.5">
+              上の地図で確認した浸水深や土砂リスクと、住まいの条件から「垂直避難」か「立ち退き避難」かを判断します。
+            </p>
+          </div>
+
+          {/* 1. 建物構造 */}
+          <div>
+            <label className="font-bold text-neutral-800 block mb-1.5 text-xs">
+              1. 自宅の建物の構造
             </label>
             <div className="grid grid-cols-3 gap-2">
               <button
@@ -557,7 +544,7 @@ export const HazardMap: React.FC<HazardMapProps> = ({ onBack }) => {
 
           {/* 2. 居室の階数 */}
           <div>
-            <label className="font-bold text-neutral-800 block mb-1.5">
+            <label className="font-bold text-neutral-800 block mb-1.5 text-xs">
               2. 主に過ごす居室・就寝階
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -599,183 +586,152 @@ export const HazardMap: React.FC<HazardMapProps> = ({ onBack }) => {
 
           {/* 3. 周辺の想定浸水深 */}
           <div>
-            <label className="font-bold text-neutral-800 block mb-1.5">
-              3. ハザードマップ上の想定浸水深
+            <label className="font-bold text-neutral-800 block mb-1.5 text-xs">
+              3. 上の地図で確認した周辺の想定浸水深
             </label>
-            <select
-              value={diagnosis.floodDepth}
-              onChange={(e) =>
-                setDiagnosis((prev) => ({
-                  ...prev,
-                  floodDepth: e.target.value as RiskDiagnosis['floodDepth'],
-                }))
-              }
-              className="w-full p-2 border border-neutral-300 rounded-lg bg-white text-neutral-800 text-xs md:text-sm font-medium"
-            >
-              <option value="none">浸水の想定なし（着色なし）</option>
-              <option value="shallow">0.5m未満（大人の膝下・床下浸水）</option>
-              <option value="medium">0.5m〜3.0m（1階床上〜1階水没）</option>
-              <option value="deep">3.0m〜5.0m以上（2階軒下〜2階水没）</option>
-            </select>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <button
+                type="button"
+                onClick={() => setDiagnosis((prev) => ({ ...prev, floodDepth: 'none' }))}
+                className={`p-2 rounded-lg border font-medium transition-all cursor-pointer text-center ${
+                  diagnosis.floodDepth === 'none'
+                    ? 'border-[#1976d2] bg-blue-50 text-[#1976d2] font-bold'
+                    : 'border-neutral-300 bg-white text-neutral-700'
+                }`}
+              >
+                色なし（想定浸水深なし）
+              </button>
+              <button
+                type="button"
+                onClick={() => setDiagnosis((prev) => ({ ...prev, floodDepth: 'shallow' }))}
+                className={`p-2 rounded-lg border font-medium transition-all cursor-pointer text-center ${
+                  diagnosis.floodDepth === 'shallow'
+                    ? 'border-[#1976d2] bg-blue-50 text-[#1976d2] font-bold'
+                    : 'border-neutral-300 bg-white text-neutral-700'
+                }`}
+              >
+                黄色（0.5m未満・床下）
+              </button>
+              <button
+                type="button"
+                onClick={() => setDiagnosis((prev) => ({ ...prev, floodDepth: 'medium' }))}
+                className={`p-2 rounded-lg border font-medium transition-all cursor-pointer text-center ${
+                  diagnosis.floodDepth === 'medium'
+                    ? 'border-[#1976d2] bg-blue-50 text-[#1976d2] font-bold'
+                    : 'border-neutral-300 bg-white text-neutral-700'
+                }`}
+              >
+                橙色〜赤（0.5〜3m・1階水没）
+              </button>
+              <button
+                type="button"
+                onClick={() => setDiagnosis((prev) => ({ ...prev, floodDepth: 'deep' }))}
+                className={`p-2 rounded-lg border font-medium transition-all cursor-pointer text-center ${
+                  diagnosis.floodDepth === 'deep'
+                    ? 'border-[#1976d2] bg-blue-50 text-[#1976d2] font-bold'
+                    : 'border-neutral-300 bg-white text-neutral-700'
+                }`}
+              >
+                ピンク〜紫（3m以上・2階水没）
+              </button>
+            </div>
           </div>
 
           {/* 4. 土砂災害警戒区域 */}
           <div>
-            <label className="font-bold text-neutral-800 block mb-1.5">
-              4. 土砂災害警戒区域（急傾斜・土石流等）
+            <label className="font-bold text-neutral-800 block mb-1.5 text-xs">
+              4. 土砂災害警戒区域（レッド・イエロー）
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2 text-xs">
               <button
                 type="button"
                 onClick={() => setDiagnosis((prev) => ({ ...prev, sedimentZone: 'none' }))}
-                className={`p-2 rounded-lg border text-center font-bold transition-all cursor-pointer text-xs ${
+                className={`p-2 rounded-lg border font-medium transition-all cursor-pointer text-center ${
                   diagnosis.sedimentZone === 'none'
-                    ? 'border-[#1976d2] bg-blue-50 text-[#1976d2]'
+                    ? 'border-[#1976d2] bg-blue-50 text-[#1976d2] font-bold'
                     : 'border-neutral-300 bg-white text-neutral-700'
                 }`}
               >
-                区域外（安全）
+                区域外（色なし）
               </button>
               <button
                 type="button"
                 onClick={() => setDiagnosis((prev) => ({ ...prev, sedimentZone: 'yellow' }))}
-                className={`p-2 rounded-lg border text-center font-bold transition-all cursor-pointer text-xs ${
+                className={`p-2 rounded-lg border font-medium transition-all cursor-pointer text-center ${
                   diagnosis.sedimentZone === 'yellow'
-                    ? 'border-amber-500 bg-amber-50 text-amber-800'
+                    ? 'border-amber-600 bg-amber-50 text-amber-900 font-bold'
                     : 'border-neutral-300 bg-white text-neutral-700'
                 }`}
               >
-                イエロー区域
+                警戒区域（イエロー）
               </button>
               <button
                 type="button"
                 onClick={() => setDiagnosis((prev) => ({ ...prev, sedimentZone: 'red' }))}
-                className={`p-2 rounded-lg border text-center font-bold transition-all cursor-pointer text-xs ${
+                className={`p-2 rounded-lg border font-medium transition-all cursor-pointer text-center ${
                   diagnosis.sedimentZone === 'red'
-                    ? 'border-red-500 bg-red-50 text-red-800'
+                    ? 'border-red-600 bg-red-50 text-red-900 font-bold'
                     : 'border-neutral-300 bg-white text-neutral-700'
                 }`}
               >
-                レッド特別警戒
+                特別警戒（レッド）
               </button>
             </div>
           </div>
 
-          {/* 5. 配慮が必要な家族 */}
-          <div className="pt-1">
-            <label className="flex items-center gap-2 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={diagnosis.hasVulnerablePeople}
-                onChange={(e) =>
-                  setDiagnosis((prev) => ({ ...prev, hasVulnerablePeople: e.target.checked }))
-                }
-                className="w-4 h-4 text-[#1976d2] rounded border-neutral-300"
-              />
-              <span className="font-bold text-neutral-800">
-                高齢者・乳幼児・自力避難が困難な家族がいる
-              </span>
-            </label>
-          </div>
-        </div>
-
-        {/* 判定結果ボックス */}
-        <div className={`p-4 rounded-xl border-2 space-y-2.5 ${evalResult.border}`}>
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <span className="text-xs font-bold text-neutral-600">判定結果：</span>
-            <span className={`py-1 px-3 rounded-full text-xs font-black shadow-2xs ${evalResult.color}`}>
-              {evalResult.badge}
+          {/* 5. 高齢者・乳幼児の同居 */}
+          <label className="flex items-center gap-2 p-2 bg-white rounded-lg border border-neutral-300 cursor-pointer text-xs">
+            <input
+              type="checkbox"
+              checked={diagnosis.hasVulnerablePeople}
+              onChange={(e) =>
+                setDiagnosis((prev) => ({ ...prev, hasVulnerablePeople: e.target.checked }))
+              }
+              className="w-4 h-4 rounded text-[#1976d2] cursor-pointer"
+            />
+            <span className="font-bold text-neutral-800">
+              高齢者、乳幼児、要介護者など避難に時間のかかる人が同居している
             </span>
-          </div>
+          </label>
 
-          <div className="text-sm md:text-base font-bold text-neutral-900 leading-snug">
-            {evalResult.action}
-          </div>
-
-          <p className="text-xs text-neutral-700 m-0 leading-relaxed border-t border-neutral-200 pt-2">
-            <strong>判定の根拠：</strong> {evalResult.reason}
-          </p>
-        </div>
-      </div>
-
-      {/* 浸水深ビジュアル解説 */}
-      <div className="bg-white rounded-xl p-5 shadow-md border border-neutral-100 space-y-3">
-        <h3 className="text-base md:text-lg font-bold text-neutral-900 flex items-center gap-2 m-0">
-          <span>📏</span>
-          <span>浸水深と危険度（目安メーター）</span>
-        </h3>
-
-        <div className="space-y-2 text-xs md:text-sm">
-          <div className="flex items-start gap-3 p-2.5 rounded-lg bg-red-50 border-l-4 border-l-red-600">
-            <div className="w-16 shrink-0 font-black text-red-700">5.0m〜</div>
-            <div>
-              <div className="font-bold text-red-900">2階の軒下以上（2階水没）</div>
-              <div className="text-neutral-600 text-xs">木造家屋は流出・水没。自宅待機は命に関わるため事前避難必須。</div>
+          {/* 判定結果 */}
+          <div className={`p-4 rounded-xl border-2 space-y-2 ${evalResult.border}`}>
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-bold text-xs text-neutral-800">避難行動の判定結果：</span>
+              <span className={`text-2xs font-extrabold px-2.5 py-1 rounded-full ${evalResult.color}`}>
+                {evalResult.badge}
+              </span>
             </div>
-          </div>
 
-          <div className="flex items-start gap-3 p-2.5 rounded-lg bg-orange-50 border-l-4 border-l-orange-500">
-            <div className="w-16 shrink-0 font-black text-orange-700">3.0m〜</div>
-            <div>
-              <div className="font-bold text-orange-900">2階の床面（1階天井水没）</div>
-              <div className="text-neutral-600 text-xs">1階部分は完全に水没。2階以上へ垂直避難、または高台へ移動。</div>
+            <div className="font-bold text-sm text-neutral-900 leading-snug">
+              {evalResult.action}
             </div>
-          </div>
 
-          <div className="flex items-start gap-3 p-2.5 rounded-lg bg-amber-50 border-l-4 border-l-amber-500">
-            <div className="w-16 shrink-0 font-black text-amber-700">0.5m〜</div>
-            <div>
-              <div className="font-bold text-amber-900">大人の膝上〜1階床上浸水</div>
-              <div className="text-neutral-600 text-xs">水圧でドアが開かなくなる。車は水没・走行不能。歩行避難は極めて危険。</div>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3 p-2.5 rounded-lg bg-sky-50 border-l-4 border-l-sky-500">
-            <div className="w-16 shrink-0 font-black text-sky-700">〜0.5m</div>
-            <div>
-              <div className="font-bold text-sky-900">床下浸水・道路冠水</div>
-              <div className="text-neutral-600 text-xs">側溝やマンホールのフタ外れに警戒。早めの備えで自宅待機可能。</div>
-            </div>
+            <p className="text-xs text-neutral-700 leading-relaxed m-0 border-t border-neutral-200/60 pt-2">
+              {evalResult.reason}
+            </p>
           </div>
         </div>
-      </div>
 
-      {/* 土砂災害の前兆チェックリスト */}
-      <div className="bg-white rounded-2xl p-5 shadow-2xs border border-neutral-200/90 space-y-3">
-        <h3 className="text-base md:text-lg font-bold text-neutral-900 flex items-center gap-2 m-0">
-          <span>⚠️</span>
-          <span>土砂災害の危険な前兆サイン（直ちに避難！）</span>
-        </h3>
-
-        <ul className="space-y-2 text-xs md:text-sm text-neutral-800 m-0 p-0 list-none">
-          <li className="flex items-start gap-2 p-2.5 bg-neutral-50 rounded-xl">
-            <span className="text-red-600 font-bold">1.</span>
-            <span>崖や斜面から小石がパラパラと落ちてくる</span>
-          </li>
-          <li className="flex items-start gap-2 p-2.5 bg-neutral-50 rounded-xl">
-            <span className="text-red-600 font-bold">2.</span>
-            <span>今まで湧いていなかった斜面から急に水が吹き出している、または湧き水が濁る</span>
-          </li>
-          <li className="flex items-start gap-2 p-2.5 bg-neutral-50 rounded-xl">
-            <span className="text-red-600 font-bold">3.</span>
-            <span>地面や擁壁、自宅の基礎に亀裂（ひび割れ）やズレが生じている</span>
-          </li>
-          <li className="flex items-start gap-2 p-2.5 bg-neutral-50 rounded-xl">
-            <span className="text-red-600 font-bold">4.</span>
-            <span>山鳴り（ゴロゴロという地鳴り）や、木が裂けるバキバキという音がする</span>
-          </li>
-          <li className="flex items-start gap-2 p-2.5 bg-neutral-50 rounded-xl">
-            <span className="text-red-600 font-bold">5.</span>
-            <span>川の水位が急激に下がる、または土の強い腐敗臭・焦げたような臭いが漂う</span>
-          </li>
-        </ul>
+        {/* 外部リンク案内 */}
+        <div className="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between flex-wrap gap-2 text-xs">
+          <span className="text-neutral-500">国土交通省 ハザードマップポータルサイト</span>
+          <a
+            href={externalUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="text-[#1976d2] hover:underline font-bold"
+          >
+            公式ポータルを別画面で開く ↗
+          </a>
+        </div>
       </div>
 
       {/* ホームに戻る */}
       <button
         type="button"
         onClick={onBack}
-        className="w-full py-3 bg-neutral-900 hover:bg-neutral-800 text-white text-center rounded-xl font-bold transition-colors cursor-pointer shadow-2xs block focus-visible:outline-2 focus-visible:outline-neutral-900"
+        className="w-full py-3 bg-neutral-900 hover:bg-neutral-800 text-white text-center rounded-xl font-bold transition-all cursor-pointer shadow-2xs hover:shadow-xs active:scale-[0.99] block text-xs md:text-sm focus-visible:outline-2 focus-visible:outline-neutral-900"
       >
         ← ホームに戻る
       </button>

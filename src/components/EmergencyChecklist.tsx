@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from 'react';
+import { ChecklistIcon, WaterIcon, FoodIcon, ToiletIcon, GasIcon, CheckCircleIcon } from './Icons';
 
 interface EmergencyChecklistProps {
   onBack: () => void;
 }
 
 const CHECKLIST_ITEMS = [
-  '💧 水・飲料水',
-  '🍚 非常食',
-  '🔦 懐中電灯',
-  '🔋 モバイルバッテリー',
-  '🩹 救急用品',
-  '🧻 ティッシュ・タオル',
-  '🧥 防寒具',
-  '😷 マスク',
+  '水・飲料水（1人1日3Lを目安に持ち出し用は500ml複数本）',
+  '非常食（加熱不要の缶詰・アルファ米・栄養補助バー）',
+  '懐中電灯・LEDランタン（予備の乾電池も準備）',
+  'モバイルバッテリー（満充電のスマホ充電器・ケーブル）',
+  '救急用品・常備薬（絆創膏・消毒液・処方薬）',
+  'ティッシュ・除菌ウェットティッシュ・タオル',
+  '防寒具・アルミブランケット・雨具',
+  'マスク・使い捨て手袋',
 ];
 
 type ChecklistTab = 'takeout' | 'stockpile';
 
 export const EmergencyChecklist: React.FC<EmergencyChecklistProps> = ({ onBack }) => {
   const [activeTab, setActiveTab] = useState<ChecklistTab>('takeout');
+  const [showResetConfirm, setShowResetConfirm] = useState<boolean>(false);
 
   // --- 非常用持ち出し袋チェックリスト ---
   const [checkedItems, setCheckedItems] = useState<boolean[]>(() => {
@@ -64,502 +66,366 @@ export const EmergencyChecklist: React.FC<EmergencyChecklistProps> = ({ onBack }
     return val !== null ? parseInt(val, 10) : 3;
   });
 
-  // 備蓄品チェック状態
-  const [stockpileChecks, setStockpileChecks] = useState<{ [key: string]: boolean }>(() => {
-    try {
-      const saved = localStorage.getItem('stockpile_checks');
-      return saved ? JSON.parse(saved) : {};
-    } catch {
-      return {};
-    }
-  });
+  useEffect(() => {
+    localStorage.setItem('stockpile_adults', String(adults));
+    localStorage.setItem('stockpile_children', String(children));
+    localStorage.setItem('stockpile_infants', String(infants));
+    localStorage.setItem('stockpile_days', String(days));
+  }, [adults, children, infants, days]);
 
-  const toggleStockpileCheck = (key: string) => {
-    setStockpileChecks((prev) => {
-      const updated = { ...prev, [key]: !prev[key] };
-      localStorage.setItem('stockpile_checks', JSON.stringify(updated));
-      return updated;
-    });
-  };
-
-  // 入力値変更時に保存
-  const updateAdults = (val: number) => {
-    const v = Math.max(0, Math.min(10, val));
-    setAdults(v);
-    localStorage.setItem('stockpile_adults', String(v));
-  };
-  const updateChildren = (val: number) => {
-    const v = Math.max(0, Math.min(10, val));
-    setChildren(v);
-    localStorage.setItem('stockpile_children', String(v));
-  };
-  const updateInfants = (val: number) => {
-    const v = Math.max(0, Math.min(5, val));
-    setInfants(v);
-    localStorage.setItem('stockpile_infants', String(v));
-  };
-  const updateDays = (val: number) => {
-    setDays(val);
-    localStorage.setItem('stockpile_days', String(val));
-  };
-
-  // 合計人数
-  const totalPeople = adults + children + infants;
-  const effectivePeople = Math.max(1, totalPeople);
-
-  // 水 (L): 大人3L, 子ども2L, 乳幼児1.5L
-  const waterLiters = (adults * 3 + children * 2 + infants * 1.5) * days;
-  const waterBottles2L = Math.ceil(waterLiters / 2);
-  const waterCases = (waterBottles2L / 6).toFixed(1);
-
-  // 食料 (食): 1人1日3食
-  const mainMeals = (adults + children) * 3 * days;
-  const sideDishes = (adults + children) * 3 * days;
-
-  // 非常用トイレ (回): 1人1日5回
-  const toiletBags = (adults + children) * 5 * days;
-
-  // カセットガスボンベ (本): 3日分=約3本, 7日分=約6本 (目安)
-  const gasCanisters = days === 7 ? Math.max(6, Math.ceil(effectivePeople * 1.5)) : Math.max(3, Math.ceil(effectivePeople * 0.8));
-
-  // 乳幼児用品
-  const infantMilk = infants * 5 * days;
-  const infantFood = infants * 3 * days;
-  const infantDiapers = infants * 6 * days;
+  const totalPeople = adults + children;
+  const waterAmount = Math.round((totalPeople * 3 + infants * 1.5) * days);
+  const waterBottles = Math.ceil(waterAmount / 2);
+  const mealsAmount = (adults + children) * 3 * days;
+  const toiletAmount = (adults + children) * 5 * days;
+  const gasCartridges = Math.ceil((days / 3) * (totalPeople >= 3 ? 3 : 2));
 
   return (
-    <div className="w-[90%] max-w-[600px] mx-auto my-6 space-y-6">
-      {/* 上部タブ切り替え */}
-      <div className="flex bg-neutral-200/80 p-1 rounded-xl shadow-xs">
-        <button
-          type="button"
-          onClick={() => setActiveTab('takeout')}
-          className={`flex-1 py-2.5 text-xs md:text-sm font-bold rounded-lg transition-all cursor-pointer text-center ${
-            activeTab === 'takeout'
-              ? 'bg-white text-neutral-900 shadow-xs'
-              : 'text-neutral-600 hover:text-neutral-900'
-          }`}
-        >
-          🎒 非常持ち出し袋（避難用）
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('stockpile')}
-          className={`flex-1 py-2.5 text-xs md:text-sm font-bold rounded-lg transition-all cursor-pointer text-center ${
-            activeTab === 'stockpile'
-              ? 'bg-[#d32f2f] text-white shadow-xs'
-              : 'text-neutral-600 hover:text-neutral-900'
-          }`}
-        >
-          🧮 備蓄量計算ツール（在宅用）
-        </button>
-      </div>
-
-      {/* タブ1: 非常持ち出し品チェックリスト */}
-      {activeTab === 'takeout' && (
-        <div className="bg-white rounded-xl p-5 shadow-md border border-neutral-100 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-[#d32f2f] flex items-center gap-2 m-0">
-              📋 非常持ち出し品チェック
-            </h2>
-            <span className="text-sm font-semibold text-neutral-600 tabular-nums">
-              {checkedCount} / {CHECKLIST_ITEMS.length} 準備完了 ({progressPercent}%)
-            </span>
+    <div className="w-[94%] max-w-5xl mx-auto my-5 md:my-6 space-y-4 md:space-y-5">
+      <div className="bg-white rounded-2xl p-5 md:p-6 shadow-2xs border border-neutral-200/90 space-y-4">
+        <h2 className="text-lg md:text-xl font-bold text-neutral-900 flex items-center gap-3 m-0">
+          <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0 shadow-2xs">
+            <ChecklistIcon className="w-5 h-5 text-emerald-600" />
           </div>
+          <span>防災チェック & 備蓄計算</span>
+        </h2>
 
-          <p className="text-xs md:text-sm text-neutral-700 leading-relaxed m-0">
-            避難所へ持ち出すリュックの中身を確認しましょう。チェックした内容は自動的に保存されます。
-          </p>
+        {/* タブ切り替え */}
+        <div className="grid grid-cols-2 p-1.5 bg-neutral-100 rounded-xl gap-1.5">
+          <button
+            type="button"
+            onClick={() => setActiveTab('takeout')}
+            className={`min-h-[44px] py-2.5 px-3 text-xs md:text-sm font-bold rounded-lg transition-colors cursor-pointer text-center flex items-center justify-center ${
+              activeTab === 'takeout'
+                ? 'bg-white text-neutral-900 shadow-2xs'
+                : 'text-neutral-600 hover:text-neutral-900'
+            }`}
+          >
+            非常持ち出し袋チェック
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('stockpile')}
+            className={`min-h-[44px] py-2.5 px-3 text-xs md:text-sm font-bold rounded-lg transition-colors cursor-pointer text-center flex items-center justify-center ${
+              activeTab === 'stockpile'
+                ? 'bg-white text-neutral-900 shadow-2xs'
+                : 'text-neutral-600 hover:text-neutral-900'
+            }`}
+          >
+            非常備蓄シミュレーター
+          </button>
+        </div>
 
-          {/* Progress bar */}
-          <div className="w-full bg-neutral-200 h-2.5 rounded-full overflow-hidden">
-            <div
-              className="bg-[#28a745] h-full transition-all duration-300"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
+        {activeTab === 'takeout' ? (
+          <div className="space-y-4">
+            {/* 進捗プログレス */}
+            <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200/80 space-y-2.5">
+              <div className="flex items-center justify-between text-xs sm:text-sm font-bold text-neutral-700">
+                <span>準備完了度</span>
+                <span className="font-mono text-emerald-700 text-sm sm:text-base">
+                  {checkedCount} / {CHECKLIST_ITEMS.length}品（{progressPercent}%）
+                </span>
+              </div>
+              <div className="w-full bg-neutral-200 h-3 rounded-full overflow-hidden">
+                <div
+                  className="bg-emerald-600 h-full rounded-full transition-all duration-300"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
 
-          {/* Checklist */}
-          <div className="space-y-2.5 pt-1">
-            {CHECKLIST_ITEMS.map((item, index) => {
-              const isChecked = checkedItems[index];
-              return (
-                <label
-                  key={index}
-                  className={`flex items-center gap-3 p-3.5 bg-neutral-50 hover:bg-neutral-100 rounded-lg cursor-pointer transition-all border border-neutral-200 ${
-                    isChecked ? 'line-through opacity-60 bg-emerald-50/50' : 'opacity-100'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    onChange={() => toggleCheck(index)}
-                    className="w-5 h-5 rounded text-[#28a745] focus:ring-[#28a745] cursor-pointer"
-                  />
-                  <span className="text-sm md:text-base font-medium text-neutral-800 select-none">
-                    {item}
+              {/* 達成度に応じたアドバイス・完了祝賀メッセージ */}
+              {progressPercent === 100 ? (
+                <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-xl flex items-start gap-2.5 text-xs text-emerald-950 mt-2">
+                  <CheckCircleIcon className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <div className="font-bold mb-0.5">非常用持ち出し袋の準備が完了しました！</div>
+                    <p className="text-2xs text-emerald-900/85 m-0 leading-relaxed">
+                      素晴らしい備えです。半年に一度（防災の日など）は飲料水や非常食の賞味期限、モバイルバッテリーや乾電池の残量を定期点検しましょう。
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-2xs text-neutral-600 leading-relaxed pt-0.5">
+                  残りあと <strong className="text-neutral-900 font-mono">{CHECKLIST_ITEMS.length - checkedCount}</strong> 品目です。まずは命を守る水・非常食・明かりの必需品から優先して揃えましょう。
+                </div>
+              )}
+            </div>
+
+            {/* チェックリスト項目一覧 */}
+            <div className="space-y-2.5">
+              {CHECKLIST_ITEMS.map((item, index) => {
+                const isChecked = checkedItems[index];
+                return (
+                  <label
+                    key={index}
+                    className={`flex items-center gap-3.5 p-3.5 sm:p-4 rounded-xl border min-h-[50px] transition-all cursor-pointer ${
+                      isChecked
+                        ? 'bg-emerald-50/60 border-emerald-200 text-neutral-600'
+                        : 'bg-white border-neutral-200 text-neutral-900 hover:border-neutral-300'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => toggleCheck(index)}
+                      className="w-5 h-5 rounded accent-emerald-600 cursor-pointer shrink-0"
+                    />
+                    <span className={`text-xs sm:text-sm font-medium ${isChecked ? 'line-through text-neutral-400' : ''}`}>
+                      {item}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+
+            <div className="pt-2">
+              {showResetConfirm ? (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
+                  <span className="text-red-900 font-bold text-2xs text-center sm:text-left">
+                    チェック状態をすべてリセットしますか？
                   </span>
-                </label>
-              );
-            })}
-          </div>
-
-          {checkedCount > 0 && (
-            <div className="pt-2 text-right">
-              <button
-                type="button"
-                onClick={handleReset}
-                className="text-xs text-neutral-500 hover:text-red-600 underline cursor-pointer"
-              >
-                チェックをすべてリセット
-              </button>
+                  <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleReset();
+                        setShowResetConfirm(false);
+                      }}
+                      className="flex-1 sm:flex-initial py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white text-2xs font-bold rounded-lg cursor-pointer transition-colors shadow-2xs text-center"
+                    >
+                      リセット実行
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowResetConfirm(false)}
+                      className="flex-1 sm:flex-initial py-1.5 px-3 bg-neutral-200 hover:bg-neutral-300 text-neutral-800 text-2xs font-bold rounded-lg cursor-pointer transition-colors text-center"
+                    >
+                      キャンセル
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowResetConfirm(true)}
+                    className="py-1 px-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 text-2xs font-bold rounded-lg transition-colors cursor-pointer"
+                  >
+                    チェックをリセット...
+                  </button>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      )}
-
-      {/* タブ2: 家族人数に応じた水・非常食の必要量計算ツール */}
-      {activeTab === 'stockpile' && (
-        <div className="bg-white rounded-xl p-5 shadow-md border border-neutral-100 space-y-5">
-          <div>
-            <h2 className="text-xl font-bold text-[#d32f2f] flex items-center gap-2 m-0">
-              🧮 備蓄量シミュレーター
-            </h2>
-            <p className="text-xs md:text-sm text-neutral-600 mt-1 leading-relaxed">
-              首相官邸・農林水産省ガイドラインに基づき、在宅避難に必要な水・食料・防災消耗品を家族構成に合わせて自動算出します。
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-xs text-neutral-600 leading-relaxed m-0">
+              ご家庭の家族構成に応じた最低限の備蓄量をシミュレーションします。
             </p>
+
+            {/* 人数・日数設定 */}
+            <div className="p-3.5 bg-neutral-50 rounded-xl border border-neutral-200/80 space-y-3">
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <div>
+                  <label htmlFor="adults-input" className="font-bold text-neutral-700 block mb-1">大人（中学生以上）</label>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setAdults((v) => Math.max(1, v - 1))}
+                      className="w-7 h-7 bg-white border border-neutral-300 rounded font-bold cursor-pointer"
+                    >
+                      -
+                    </button>
+                    <span id="adults-input" className="font-bold font-mono text-sm w-5 text-center">{adults}</span>
+                    <button
+                      type="button"
+                      onClick={() => setAdults((v) => v + 1)}
+                      className="w-7 h-7 bg-white border border-neutral-300 rounded font-bold cursor-pointer"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="children-input" className="font-bold text-neutral-700 block mb-1">子ども（小学生）</label>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setChildren((v) => Math.max(0, v - 1))}
+                      className="w-7 h-7 bg-white border border-neutral-300 rounded font-bold cursor-pointer"
+                    >
+                      -
+                    </button>
+                    <span id="children-input" className="font-bold font-mono text-sm w-5 text-center">{children}</span>
+                    <button
+                      type="button"
+                      onClick={() => setChildren((v) => v + 1)}
+                      className="w-7 h-7 bg-white border border-neutral-300 rounded font-bold cursor-pointer"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="infants-input" className="font-bold text-neutral-700 block mb-1">乳幼児（0〜5歳）</label>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setInfants((v) => Math.max(0, v - 1))}
+                      className="w-7 h-7 bg-white border border-neutral-300 rounded font-bold cursor-pointer"
+                    >
+                      -
+                    </button>
+                    <span id="infants-input" className="font-bold font-mono text-sm w-5 text-center">{infants}</span>
+                    <button
+                      type="button"
+                      onClick={() => setInfants((v) => v + 1)}
+                      className="w-7 h-7 bg-white border border-neutral-300 rounded font-bold cursor-pointer"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-neutral-200">
+                <span className="text-xs font-bold text-neutral-700 block mb-1.5">備蓄日数目標</span>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setDays(3)}
+                    className={`py-1.5 px-2 rounded-lg border font-bold transition-all cursor-pointer text-center ${
+                      days === 3
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
+                        : 'border-neutral-300 bg-white text-neutral-700'
+                    }`}
+                  >
+                    3日間（最低限）
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDays(7)}
+                    className={`py-1.5 px-2 rounded-lg border font-bold transition-all cursor-pointer text-center ${
+                      days === 7
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
+                        : 'border-neutral-300 bg-white text-neutral-700'
+                    }`}
+                  >
+                    7日間（推奨）
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* 計算結果 */}
+            <div className="space-y-2">
+              <span className="font-bold text-xs text-neutral-900 block">
+                必要備蓄量の目安（{days}日分）：
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div className="p-3.5 bg-neutral-50 rounded-xl border border-neutral-200/80">
+                  <span className="text-2xs text-neutral-600 font-bold flex items-center gap-1.5 mb-1">
+                    <WaterIcon className="w-3.5 h-3.5 text-sky-600" />
+                    <span>飲料水</span>
+                  </span>
+                  <div className="font-black text-xl text-neutral-900 font-mono mt-0.5">
+                    {waterAmount}<span className="text-xs font-normal text-neutral-500 ml-0.5">L</span>
+                  </div>
+                  <span className="text-2xs text-neutral-400">（2Lペットボトル約{waterBottles}本）</span>
+                </div>
+                <div className="p-3.5 bg-neutral-50 rounded-xl border border-neutral-200/80">
+                  <span className="text-2xs text-neutral-600 font-bold flex items-center gap-1.5 mb-1">
+                    <FoodIcon className="w-3.5 h-3.5 text-amber-600" />
+                    <span>非常食</span>
+                  </span>
+                  <div className="font-black text-xl text-neutral-900 font-mono mt-0.5">
+                    {mealsAmount}<span className="text-xs font-normal text-neutral-500 ml-0.5">食</span>
+                  </div>
+                  <span className="text-2xs text-neutral-400">（1人1日3食分）</span>
+                </div>
+                <div className="p-3.5 bg-neutral-50 rounded-xl border border-neutral-200/80">
+                  <span className="text-2xs text-neutral-600 font-bold flex items-center gap-1.5 mb-1">
+                    <ToiletIcon className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>簡易トイレ</span>
+                  </span>
+                  <div className="font-black text-xl text-neutral-900 font-mono mt-0.5">
+                    {toiletAmount}<span className="text-xs font-normal text-neutral-500 ml-0.5">回分</span>
+                  </div>
+                  <span className="text-2xs text-neutral-400">（1人1日5回分）</span>
+                </div>
+                <div className="p-3.5 bg-neutral-50 rounded-xl border border-neutral-200/80">
+                  <span className="text-2xs text-neutral-600 font-bold flex items-center gap-1.5 mb-1">
+                    <GasIcon className="w-3.5 h-3.5 text-red-600" />
+                    <span>ガスボンベ</span>
+                  </span>
+                  <div className="font-black text-xl text-neutral-900 font-mono mt-0.5">
+                    {gasCartridges}<span className="text-xs font-normal text-neutral-500 ml-0.5">本</span>
+                  </div>
+                  <span className="text-2xs text-neutral-400">（カセットコンロ用）</span>
+                </div>
+              </div>
+
+              {/* 算出根拠・目安の内訳解説 */}
+              <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200/90 space-y-3 mt-3">
+                <div className="font-bold text-xs text-neutral-900 flex items-center justify-between">
+                  <span>なぜこの備蓄量が必要？（国の防災基準に基づく算出根拠）</span>
+                  <span className="text-2xs text-neutral-500 font-normal">農水省・内閣府推奨基準</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-2xs leading-relaxed text-neutral-700">
+                  <div className="p-2.5 bg-white rounded-lg border border-neutral-200 space-y-1">
+                    <div className="font-bold text-neutral-900 flex items-center gap-1.5">
+                      <WaterIcon className="w-3.5 h-3.5 text-sky-600" />
+                      <span>飲料水：1人1日3Lの根拠</span>
+                    </div>
+                    <p className="m-0 text-neutral-600">
+                      生命維持に必要な水分（約2L）に加え、最低限の調理や衛生用（約1L）の合計です。乳幼児がいる場合は調乳用等に1人1日1.5Lで加算計算しています。
+                    </p>
+                  </div>
+
+                  <div className="p-2.5 bg-white rounded-lg border border-neutral-200 space-y-1">
+                    <div className="font-bold text-neutral-900 flex items-center gap-1.5">
+                      <FoodIcon className="w-3.5 h-3.5 text-amber-600" />
+                      <span>非常食：最低3日〜7日分の根拠</span>
+                    </div>
+                    <p className="m-0 text-neutral-600">
+                      発災から行政の公助（救援物資の配布）が本格化するまでに最低3日〜長くて1週間かかります。主食（アルファ米等）と主菜缶詰をローリングストックしましょう。
+                    </p>
+                  </div>
+
+                  <div className="p-2.5 bg-white rounded-lg border border-neutral-200 space-y-1">
+                    <div className="font-bold text-neutral-900 flex items-center gap-1.5">
+                      <ToiletIcon className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>簡易トイレ：1人1日5回分の根拠</span>
+                    </div>
+                    <p className="m-0 text-neutral-600">
+                      下水管破損や停電・断水時は水洗トイレが逆流・使用禁止になります。成人の1日平均排泄回数（約5回）に人数と日数を掛け合わせた必須備蓄数です。
+                    </p>
+                  </div>
+
+                  <div className="p-2.5 bg-white rounded-lg border border-neutral-200 space-y-1">
+                    <div className="font-bold text-neutral-900 flex items-center gap-1.5">
+                      <GasIcon className="w-3.5 h-3.5 text-red-600" />
+                      <span>カセットガス：3日あたり約2〜3本の根拠</span>
+                    </div>
+                    <p className="m-0 text-neutral-600">
+                      電気・都市ガス停止時にお湯を沸かし温かいレトルト食品を調理するための熱源です。カセットコンロ1台で約3日に2〜3本を消費します。
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-
-          {/* 家族構成入力エリア */}
-          <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200 space-y-3.5">
-            <div className="font-bold text-xs md:text-sm text-neutral-800">
-              1. ご家族の人数を入力してください
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {/* 大人 */}
-              <div className="bg-white p-3 rounded-lg border border-neutral-200 flex flex-col justify-between">
-                <div>
-                  <span className="text-xs font-bold text-neutral-800 block">🧑 大人</span>
-                  <span className="text-2xs text-neutral-500">中学生以上</span>
-                </div>
-                <div className="flex items-center justify-between mt-2">
-                  <button
-                    type="button"
-                    onClick={() => updateAdults(adults - 1)}
-                    className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold flex items-center justify-center cursor-pointer disabled:opacity-30 text-base"
-                    disabled={adults <= 0}
-                  >
-                    −
-                  </button>
-                  <span className="font-bold text-lg tabular-nums text-neutral-900">{adults} 人</span>
-                  <button
-                    type="button"
-                    onClick={() => updateAdults(adults + 1)}
-                    className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold flex items-center justify-center cursor-pointer disabled:opacity-30 text-base"
-                    disabled={adults >= 10}
-                  >
-                    ＋
-                  </button>
-                </div>
-              </div>
-
-              {/* 子ども */}
-              <div className="bg-white p-3 rounded-lg border border-neutral-200 flex flex-col justify-between">
-                <div>
-                  <span className="text-xs font-bold text-neutral-800 block">👦 子ども</span>
-                  <span className="text-2xs text-neutral-500">小学生以下</span>
-                </div>
-                <div className="flex items-center justify-between mt-2">
-                  <button
-                    type="button"
-                    onClick={() => updateChildren(children - 1)}
-                    className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold flex items-center justify-center cursor-pointer disabled:opacity-30 text-base"
-                    disabled={children <= 0}
-                  >
-                    −
-                  </button>
-                  <span className="font-bold text-lg tabular-nums text-neutral-900">{children} 人</span>
-                  <button
-                    type="button"
-                    onClick={() => updateChildren(children + 1)}
-                    className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold flex items-center justify-center cursor-pointer disabled:opacity-30 text-base"
-                    disabled={children >= 10}
-                  >
-                    ＋
-                  </button>
-                </div>
-              </div>
-
-              {/* 乳幼児 */}
-              <div className="bg-white p-3 rounded-lg border border-neutral-200 flex flex-col justify-between">
-                <div>
-                  <span className="text-xs font-bold text-neutral-800 block">👶 乳幼児</span>
-                  <span className="text-2xs text-neutral-500">ミルク・おむつ</span>
-                </div>
-                <div className="flex items-center justify-between mt-2">
-                  <button
-                    type="button"
-                    onClick={() => updateInfants(infants - 1)}
-                    className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold flex items-center justify-center cursor-pointer disabled:opacity-30 text-base"
-                    disabled={infants <= 0}
-                  >
-                    −
-                  </button>
-                  <span className="font-bold text-lg tabular-nums text-neutral-900">{infants} 人</span>
-                  <button
-                    type="button"
-                    onClick={() => updateInfants(infants + 1)}
-                    className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold flex items-center justify-center cursor-pointer disabled:opacity-30 text-base"
-                    disabled={infants >= 5}
-                  >
-                    ＋
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* 備蓄日数選択 */}
-            <div className="pt-1">
-              <div className="font-bold text-xs md:text-sm text-neutral-800 mb-1.5">
-                2. 備蓄日数を選択してください
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => updateDays(3)}
-                  className={`py-2.5 px-3 rounded-lg text-xs md:text-sm font-bold border transition-all cursor-pointer flex flex-col items-center ${
-                    days === 3
-                      ? 'bg-[#1976d2] text-white border-[#1976d2] shadow-xs'
-                      : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-100'
-                  }`}
-                >
-                  <span>3日分（最低限）</span>
-                  <span className="text-2xs opacity-90 mt-0.5">救助・支援物資が届く目安</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => updateDays(7)}
-                  className={`py-2.5 px-3 rounded-lg text-xs md:text-sm font-bold border transition-all cursor-pointer flex flex-col items-center ${
-                    days === 7
-                      ? 'bg-[#28a745] text-white border-[#28a745] shadow-xs'
-                      : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-100'
-                  }`}
-                >
-                  <span>7日分（推奨・安心）</span>
-                  <span className="text-2xs opacity-90 mt-0.5">大規模災害時に安心な備蓄量</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* 計算結果サマリーバナー */}
-          <div className="p-3.5 bg-amber-50 rounded-xl border border-amber-200 text-amber-950 flex items-center justify-between text-xs md:text-sm">
-            <span>
-              対象：<strong>ご家族 {totalPeople} 人</strong>（{days}日分）
-            </span>
-            <span className="font-bold text-amber-800">
-              {days === 7 ? '★ 推奨1週間備蓄' : '● 最低3日備蓄'}
-            </span>
-          </div>
-
-          {/* 算出結果カード一覧 */}
-          <div className="space-y-3">
-            <h3 className="text-base font-bold text-neutral-800 m-0 flex items-center gap-1.5">
-              📦 必要な備蓄品と数量の目安
-            </h3>
-
-            {/* 水 */}
-            <div
-              onClick={() => toggleStockpileCheck('water')}
-              className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
-                stockpileChecks['water']
-                  ? 'bg-emerald-50/70 border-emerald-300'
-                  : 'bg-neutral-50 border-neutral-200 hover:bg-neutral-100/70'
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <span className="text-2xl mt-0.5">💧</span>
-                <div>
-                  <div className="font-bold text-sm md:text-base text-neutral-900 flex items-center gap-2">
-                    <span>飲料水・調理用水</span>
-                    {stockpileChecks['water'] && (
-                      <span className="text-2xs bg-emerald-600 text-white font-bold px-1.5 py-0.5 rounded">準備済</span>
-                    )}
-                  </div>
-                  <div className="text-xs text-neutral-600 mt-0.5">
-                    1人1日3L目安（大人・子ども・調乳用を含む）
-                  </div>
-                </div>
-              </div>
-              <div className="text-right shrink-0">
-                <span className="text-xl md:text-2xl font-bold text-blue-600 tabular-nums">{waterLiters}</span>
-                <span className="text-xs font-bold text-neutral-600 ml-1">L</span>
-                <div className="text-2xs text-neutral-500 font-medium">
-                  2Lボトル 約{waterBottles2L}本（約{waterCases}箱）
-                </div>
-              </div>
-            </div>
-
-            {/* 主食 */}
-            <div
-              onClick={() => toggleStockpileCheck('main_meals')}
-              className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
-                stockpileChecks['main_meals']
-                  ? 'bg-emerald-50/70 border-emerald-300'
-                  : 'bg-neutral-50 border-neutral-200 hover:bg-neutral-100/70'
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <span className="text-2xl mt-0.5">🍚</span>
-                <div>
-                  <div className="font-bold text-sm md:text-base text-neutral-900 flex items-center gap-2">
-                    <span>主食（ご飯・パン・麺等）</span>
-                    {stockpileChecks['main_meals'] && (
-                      <span className="text-2xs bg-emerald-600 text-white font-bold px-1.5 py-0.5 rounded">準備済</span>
-                    )}
-                  </div>
-                  <div className="text-xs text-neutral-600 mt-0.5">
-                    アルファ化米、レトルトご飯、缶詰パンなど（1日3食）
-                  </div>
-                </div>
-              </div>
-              <div className="text-right shrink-0">
-                <span className="text-xl md:text-2xl font-bold text-amber-700 tabular-nums">{mainMeals}</span>
-                <span className="text-xs font-bold text-neutral-600 ml-1">食分</span>
-              </div>
-            </div>
-
-            {/* 副菜・おかず */}
-            <div
-              onClick={() => toggleStockpileCheck('side_dishes')}
-              className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
-                stockpileChecks['side_dishes']
-                  ? 'bg-emerald-50/70 border-emerald-300'
-                  : 'bg-neutral-50 border-neutral-200 hover:bg-neutral-100/70'
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <span className="text-2xl mt-0.5">🥫</span>
-                <div>
-                  <div className="font-bold text-sm md:text-base text-neutral-900 flex items-center gap-2">
-                    <span>副菜・おかず缶詰・レトルト</span>
-                    {stockpileChecks['side_dishes'] && (
-                      <span className="text-2xs bg-emerald-600 text-white font-bold px-1.5 py-0.5 rounded">準備済</span>
-                    )}
-                  </div>
-                  <div className="text-xs text-neutral-600 mt-0.5">
-                    肉・魚の缶詰、野菜スープ、レトルトカレーなど
-                  </div>
-                </div>
-              </div>
-              <div className="text-right shrink-0">
-                <span className="text-xl md:text-2xl font-bold text-amber-700 tabular-nums">{sideDishes}</span>
-                <span className="text-xs font-bold text-neutral-600 ml-1">食分</span>
-              </div>
-            </div>
-
-            {/* 非常用簡易トイレ */}
-            <div
-              onClick={() => toggleStockpileCheck('toilet')}
-              className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
-                stockpileChecks['toilet']
-                  ? 'bg-emerald-50/70 border-emerald-300'
-                  : 'bg-neutral-50 border-neutral-200 hover:bg-neutral-100/70'
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <span className="text-2xl mt-0.5">🚽</span>
-                <div>
-                  <div className="font-bold text-sm md:text-base text-neutral-900 flex items-center gap-2">
-                    <span>非常用簡易トイレ袋・凝固剤</span>
-                    {stockpileChecks['toilet'] && (
-                      <span className="text-2xs bg-emerald-600 text-white font-bold px-1.5 py-0.5 rounded">準備済</span>
-                    )}
-                  </div>
-                  <div className="text-xs text-neutral-600 mt-0.5">
-                    断水・下水破損時に便器に被せて使用（1人1日5回）
-                  </div>
-                </div>
-              </div>
-              <div className="text-right shrink-0">
-                <span className="text-xl md:text-2xl font-bold text-indigo-700 tabular-nums">{toiletBags}</span>
-                <span className="text-xs font-bold text-neutral-600 ml-1">回分</span>
-              </div>
-            </div>
-
-            {/* 熱源・カセットボンベ */}
-            <div
-              onClick={() => toggleStockpileCheck('gas')}
-              className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
-                stockpileChecks['gas']
-                  ? 'bg-emerald-50/70 border-emerald-300'
-                  : 'bg-neutral-50 border-neutral-200 hover:bg-neutral-100/70'
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <span className="text-2xl mt-0.5">🔥</span>
-                <div>
-                  <div className="font-bold text-sm md:text-base text-neutral-900 flex items-center gap-2">
-                    <span>カセットコンロ用ガスボンベ</span>
-                    {stockpileChecks['gas'] && (
-                      <span className="text-2xs bg-emerald-600 text-white font-bold px-1.5 py-0.5 rounded">準備済</span>
-                    )}
-                  </div>
-                  <div className="text-xs text-neutral-600 mt-0.5">
-                    温かい食事・お湯の沸騰用（カセットコンロ本体も要準備）
-                  </div>
-                </div>
-              </div>
-              <div className="text-right shrink-0">
-                <span className="text-xl md:text-2xl font-bold text-red-600 tabular-nums">約 {gasCanisters}</span>
-                <span className="text-xs font-bold text-neutral-600 ml-1">本</span>
-              </div>
-            </div>
-
-            {/* 乳幼児特有備蓄（乳幼児 > 0 の場合） */}
-            {infants > 0 && (
-              <div className="p-4 rounded-xl border border-pink-200 bg-pink-50/60 space-y-3">
-                <div className="flex items-center gap-2 font-bold text-sm md:text-base text-pink-900">
-                  <span>🍼</span>
-                  <span>乳幼児用備蓄セット（{infants}人分）</span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-pink-950 font-medium">
-                  <div className="bg-white p-2.5 rounded-lg border border-pink-200">
-                    <div>液体ミルク・粉ミルク</div>
-                    <div className="text-base font-bold text-pink-700 mt-1">{infantMilk} 回分</div>
-                  </div>
-                  <div className="bg-white p-2.5 rounded-lg border border-pink-200">
-                    <div>ベビーフード・離乳食</div>
-                    <div className="text-base font-bold text-pink-700 mt-1">{infantFood} 食分</div>
-                  </div>
-                  <div className="bg-white p-2.5 rounded-lg border border-pink-200">
-                    <div>紙おむつ</div>
-                    <div className="text-base font-bold text-pink-700 mt-1">{infantDiapers} 枚</div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* ローリングストック案内 */}
-          <div className="p-4 bg-neutral-100 rounded-xl text-neutral-700 text-xs leading-relaxed space-y-1.5">
-            <div className="font-bold text-neutral-900 flex items-center gap-1.5">
-              <span>🔄</span>
-              <span>ローリングストック（日常備蓄）のすすめ</span>
-            </div>
-            <p className="m-0">
-              普段食べている缶詰、レトルト食品、ペットボトル飲料を少し多めに買い置きし、賞味期限の近いものから普段の食事で消費して、買い足す習慣をつけると、無理なく非常時の食料を確保できます。
-            </p>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* ホームに戻る */}
       <button
         type="button"
         onClick={onBack}
-        className="w-full py-3 bg-neutral-900 hover:bg-neutral-800 text-white text-center rounded-xl font-bold transition-colors cursor-pointer shadow-2xs block focus-visible:outline-2 focus-visible:outline-neutral-900"
+        className="w-full py-3 bg-neutral-900 hover:bg-neutral-800 text-white text-center rounded-xl font-bold transition-all cursor-pointer shadow-2xs hover:shadow-xs active:scale-[0.99] block text-xs md:text-sm focus-visible:outline-2 focus-visible:outline-neutral-900"
       >
         ← ホームに戻る
       </button>

@@ -8,7 +8,6 @@ import { HazardMap } from './components/HazardMap';
 import { EmergencyChecklist } from './components/EmergencyChecklist';
 import { ActionGuidelines } from './components/ActionGuidelines';
 import { FamilyContact } from './components/FamilyContact';
-import { DisasterQuiz } from './components/DisasterQuiz';
 import { OfflineIndicator } from './components/OfflineIndicator';
 
 export const App: React.FC = () => {
@@ -28,7 +27,7 @@ export const App: React.FC = () => {
         {/* Screen navigation tabs when in subscreen */}
         {currentScreen !== 'home' && (
           <div className="border-t border-neutral-100 overflow-x-auto no-scrollbar scroll-smooth">
-            <div className="max-w-[640px] mx-auto px-3 py-1.5 flex items-center gap-1.5 text-xs whitespace-nowrap">
+            <div className="max-w-5xl mx-auto px-4 py-1.5 flex items-center gap-1.5 text-xs whitespace-nowrap">
               <button
                 type="button"
                 onClick={() => handleNavigate('home')}
@@ -104,17 +103,6 @@ export const App: React.FC = () => {
               >
                 家族連絡
               </button>
-              <button
-                type="button"
-                onClick={() => handleNavigate('quiz')}
-                className={`py-1 px-2.5 rounded-lg font-semibold transition-colors cursor-pointer ${
-                  currentScreen === 'quiz'
-                    ? 'bg-teal-600 text-white shadow-2xs'
-                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-                }`}
-              >
-                クイズ
-              </button>
             </div>
           </div>
         )}
@@ -131,7 +119,6 @@ export const App: React.FC = () => {
         {currentScreen === 'checklist' && <EmergencyChecklist onBack={() => handleNavigate('home')} />}
         {currentScreen === 'actions' && <ActionGuidelines onBack={() => handleNavigate('home')} />}
         {currentScreen === 'family' && <FamilyContact onBack={() => handleNavigate('home')} />}
-        {currentScreen === 'quiz' && <DisasterQuiz onBack={() => handleNavigate('home')} />}
       </main>
 
       {/* Offline Status Toast */}
@@ -139,7 +126,7 @@ export const App: React.FC = () => {
 
       {/* Footer */}
       <footer className="mt-auto py-5 border-t border-neutral-200/80 text-center text-xs text-neutral-500 bg-white">
-        <div className="max-w-[620px] mx-auto px-4 space-y-1.5">
+        <div className="max-w-5xl mx-auto px-4 space-y-1.5">
           <div className="flex items-center justify-center gap-2 font-medium text-neutral-600">
             <span className="font-bold text-neutral-900">SafeNow</span>
             <span>·</span>

@@ -1,4 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import {
+  ShelterIcon,
+  EarthquakeIcon,
+  TsunamiIcon,
+  RainIcon,
+  LocationPinIcon,
+  SearchIcon,
+  WalkIcon,
+  MapFoldIcon,
+  LightbulbIcon,
+  SchoolIcon,
+  CommunityIcon,
+  GymIcon,
+  ParkIcon,
+  TsunamiBuildingIcon,
+} from './Icons';
 
 interface SheltersProps {
   onBack: () => void;
@@ -185,41 +201,40 @@ export const Shelters: React.FC<SheltersProps> = ({ onBack }) => {
     return `https://www.google.com/maps/search/${encodeURIComponent(keyword)}`;
   };
 
-  // 国土地理院 地図iframeのURL
+  // 地理院地図URL生成
   const getGsiMapUrl = () => {
-    if (appliedSearch && targetCoords) {
-      return `https://maps.gsi.go.jp/#15/${targetCoords.lat}/${targetCoords.lng}/&ls=std`;
-    }
-    if (currentLocation) {
-      return `https://maps.gsi.go.jp/#15/${currentLocation.lat}/${currentLocation.lng}/&ls=std`;
-    }
-    return `https://maps.gsi.go.jp/#13/35.6812/139.7671/&ls=std`;
+    const lat = targetCoords?.lat ?? currentLocation?.lat ?? 35.6812;
+    const lng = targetCoords?.lng ?? currentLocation?.lng ?? 139.7671;
+    return `https://maps.gsi.go.jp/?ll=${lat},${lng}&z=15#15/${lat}/${lng}/&base=std&ls=std%7Cskhb01%7Cskhb02%7Cskhb03&blend=0&disp=1111`;
   };
 
-  // 災害種別ごとの避難アドバイス
   const getDisasterNotice = () => {
     switch (selectedDisaster) {
       case 'tsunami':
         return {
-          title: '🌊 津波警戒時の避難先',
+          title: '津波警戒時の避難先',
+          icon: <TsunamiIcon className="w-4 h-4 text-[#0088cc] shrink-0" />,
           bg: 'bg-sky-50 border-sky-300 text-sky-950',
           advice: '海岸や河川からただちに離れ、「津波避難ビル（3階以上の頑丈なRC造）」や「指定の高台」へ避難してください。',
         };
       case 'flood':
         return {
-          title: '🌧️ 大雨・水害時の避難先',
+          title: '大雨・水害時の避難先',
+          icon: <RainIcon className="w-4 h-4 text-[#2196f3] shrink-0" />,
           bg: 'bg-blue-50 border-blue-300 text-blue-950',
           advice: '浸水想定区域外の高台避難所へ。夜間や浸水開始後の移動が危険な場合は、無理せず自宅や近隣の2階以上（垂直避難）を確保してください。',
         };
       case 'earthquake':
         return {
-          title: '🔴 地震発生時の避難先',
+          title: '地震発生時の避難先',
+          icon: <EarthquakeIcon className="w-4 h-4 text-[#d32f2f] shrink-0" />,
           bg: 'bg-red-50 border-red-300 text-red-950',
           advice: '身の安全を確保後、倒壊や火災の危険がある場合は指定の小中学校や「広域避難場所（大規模公園）」へ移動してください。',
         };
       default:
         return {
-          title: '🏃 避難所の基本案内',
+          title: '避難所の基本案内',
+          icon: <ShelterIcon className="w-4 h-4 text-neutral-700 shrink-0" />,
           bg: 'bg-neutral-50 border-neutral-200 text-neutral-800',
           advice: '地域の指定避難所（小中学校・公民館・体育館）を確認し、避難経路の安全を確認しながら行動しましょう。',
         };
@@ -228,41 +243,41 @@ export const Shelters: React.FC<SheltersProps> = ({ onBack }) => {
 
   const notice = getDisasterNotice();
 
-  // 表示する施設リスト（災害種別に応じた強調）
+  // 表示する施設リスト
   const facilities = [
     {
-      icon: '🏫',
+      icon: <SchoolIcon className="w-4.5 h-4.5 text-neutral-700" />,
       name: '小・中学校（指定避難所）',
       desc: '地域の中核となる指定一般避難所。食料・生活物資や宿泊スペースが配備されます。',
       suitableFor: ['all', 'earthquake', 'flood'],
       searchTag: '小学校 中学校 指定避難所',
     },
     {
-      icon: '🏢',
+      icon: <CommunityIcon className="w-4.5 h-4.5 text-neutral-700" />,
       name: '公民館・地域センター',
       desc: '地域の身近な避難所。情報伝達や一時的な避難所として利用されます。',
       suitableFor: ['all', 'earthquake'],
       searchTag: '公民館 地域センター 避難所',
     },
     {
-      icon: '🏟️',
+      icon: <GymIcon className="w-4.5 h-4.5 text-neutral-700" />,
       name: '体育館・スポーツセンター',
       desc: '耐震構造が整っており、大勢の避難者を受け入れられる拠点避難所です。',
       suitableFor: ['all', 'earthquake'],
       searchTag: '体育館 避難所',
     },
     {
-      icon: '🌳',
+      icon: <ParkIcon className="w-4.5 h-4.5 text-neutral-700" />,
       name: '広域避難場所（大型公園・広場）',
       desc: '大地震時の大規模火災の延焼から身を守るための広大な避難場所です。',
       suitableFor: ['all', 'earthquake'],
       searchTag: '広域避難場所 公園',
     },
     {
-      icon: '🏢',
-      name: '津波避難ビル・高台',
-      desc: '津波警報発令時に緊急避難するための3階建て以上の堅牢な建物や高台です。',
-      suitableFor: ['tsunami'],
+      icon: <TsunamiBuildingIcon className="w-4.5 h-4.5 text-neutral-700" />,
+      name: '津波避難ビル・高台避難場所',
+      desc: '3階以上の鉄筋コンクリート造建物。津波発生時の緊急退避用です。',
+      suitableFor: ['all', 'tsunami'],
       searchTag: '津波避難ビル 高台',
     },
   ];
@@ -273,14 +288,17 @@ export const Shelters: React.FC<SheltersProps> = ({ onBack }) => {
   );
 
   return (
-    <div className="w-[90%] max-w-[600px] mx-auto my-6 space-y-6">
-      <div className="bg-white rounded-xl p-5 shadow-md border border-neutral-100 space-y-5">
-        <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
-          <h2 className="text-xl font-bold text-[#d32f2f] flex items-center gap-2 m-0">
-            🏃 避難場所案内
+    <div className="w-[94%] max-w-5xl mx-auto my-5 md:my-6 space-y-4 md:space-y-5">
+      <div className="bg-white rounded-2xl p-5 md:p-6 shadow-2xs border border-neutral-200/90 space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+          <h2 className="text-lg md:text-xl font-bold text-neutral-900 flex items-center gap-3 m-0">
+            <div className="w-10 h-10 rounded-full bg-sky-50 text-sky-600 border border-sky-100 flex items-center justify-center shrink-0 shadow-2xs">
+              <ShelterIcon className="w-5 h-5 text-sky-600" />
+            </div>
+            <span>避難場所・ルート案内</span>
           </h2>
           {currentLocation && (
-            <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+            <span className="text-2xs bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold px-2 py-0.5 rounded-full">
               GPS測位済
             </span>
           )}
@@ -288,16 +306,16 @@ export const Shelters: React.FC<SheltersProps> = ({ onBack }) => {
 
         {/* 災害種別フィルタータブ */}
         <div>
-          <div className="text-xs font-bold text-neutral-600 mb-1.5">
+          <div className="text-xs font-bold text-neutral-700 mb-1.5">
             災害の種類を選択してください：
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 bg-neutral-100 rounded-lg">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-1.5 bg-neutral-100 rounded-xl">
             <button
               type="button"
               onClick={() => setSelectedDisaster('all')}
-              className={`py-2 px-2 text-xs font-bold rounded-md transition-colors cursor-pointer text-center ${
+              className={`min-h-[44px] py-2 px-3 text-xs sm:text-sm font-bold rounded-lg transition-colors cursor-pointer text-center flex items-center justify-center ${
                 selectedDisaster === 'all'
-                  ? 'bg-white text-neutral-900 shadow-xs'
+                  ? 'bg-white text-neutral-900 shadow-2xs'
                   : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
@@ -306,131 +324,133 @@ export const Shelters: React.FC<SheltersProps> = ({ onBack }) => {
             <button
               type="button"
               onClick={() => setSelectedDisaster('earthquake')}
-              className={`py-2 px-2 text-xs font-bold rounded-md transition-colors cursor-pointer text-center ${
+              className={`min-h-[44px] py-2 px-3 text-xs sm:text-sm font-bold rounded-lg transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5 ${
                 selectedDisaster === 'earthquake'
                   ? 'bg-[#d32f2f] text-white shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
-              🔴 地震
+              <EarthquakeIcon className="w-4 h-4 shrink-0" />
+              <span>地震</span>
             </button>
             <button
               type="button"
               onClick={() => setSelectedDisaster('tsunami')}
-              className={`py-2 px-2 text-xs font-bold rounded-md transition-colors cursor-pointer text-center ${
+              className={`min-h-[44px] py-2 px-3 text-xs sm:text-sm font-bold rounded-lg transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5 ${
                 selectedDisaster === 'tsunami'
                   ? 'bg-[#0088cc] text-white shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
-              🌊 津波
+              <TsunamiIcon className="w-4 h-4 shrink-0" />
+              <span>津波</span>
             </button>
             <button
               type="button"
               onClick={() => setSelectedDisaster('flood')}
-              className={`py-2 px-2 text-xs font-bold rounded-md transition-colors cursor-pointer text-center ${
+              className={`min-h-[44px] py-2 px-3 text-xs sm:text-sm font-bold rounded-lg transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5 ${
                 selectedDisaster === 'flood'
-                  ? 'bg-[#1976d2] text-white shadow-xs'
+                  ? 'bg-[#2196f3] text-white shadow-xs'
                   : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
-              🌧️ 水害・土砂
+              <RainIcon className="w-4 h-4 shrink-0" />
+              <span>水害</span>
             </button>
           </div>
         </div>
 
-        {/* 現在地カード & 最寄りルート案内 */}
-        <div className="p-4 bg-emerald-50/70 rounded-xl border border-emerald-200 space-y-3">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <div className="font-bold text-emerald-950 text-sm flex items-center gap-1.5">
-                <span>📍</span>
-                <span>{currentLocation?.address || '現在地周辺の避難場所'}</span>
-              </div>
-              <p className="text-xs text-emerald-800 mt-1">
-                {locationMessage}
-              </p>
-            </div>
+        {/* 災害種別に応じた注意書き・アドバイス */}
+        <div className={`p-3.5 rounded-xl border text-xs leading-relaxed ${notice.bg}`}>
+          <div className="font-bold mb-1 flex items-center gap-1.5">
+            {notice.icon}
+            <span>{notice.title}</span>
+          </div>
+          <div>{notice.advice}</div>
+        </div>
+
+        {/* 現在地取得セクション */}
+        <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200/90 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="font-bold text-xs md:text-sm text-neutral-800 flex items-center gap-1.5">
+              <LocationPinIcon className="w-4 h-4 text-neutral-700 shrink-0" />
+              <span>現在地から避難所を探す</span>
+            </span>
             <button
               type="button"
               onClick={detectLocation}
               disabled={isLocating}
-              className="shrink-0 text-xs py-1.5 px-3 bg-white hover:bg-neutral-50 text-emerald-800 font-bold border border-emerald-300 rounded-lg shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
+              className="py-1 px-3 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer shadow-2xs disabled:opacity-50"
             >
-              {isLocating ? '測位中...' : '🔄 再取得'}
+              {isLocating ? '測位中...' : '現在地を取得'}
             </button>
           </div>
 
-          {/* 最寄り避難所へのワンタップ徒歩ルート */}
-          <div className="pt-1">
-            <a
-              href={getWalkingRouteUrl()}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-[#28a745] hover:bg-[#218838] text-white rounded-lg text-sm md:text-base font-bold shadow-sm transition-transform active:scale-[0.99] cursor-pointer"
-            >
-              <span>🚶</span>
-              <span>
-                {appliedSearch
-                  ? `「${appliedSearch}」から最寄りの避難所へルート案内 ↗`
-                  : '現在地から最寄りの避難所へ徒歩ルート案内 ↗'}
-              </span>
-            </a>
-          </div>
+          <p className="text-2xs md:text-xs text-neutral-600 m-0 leading-relaxed">
+            {locationMessage}
+          </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+          {/* 現在地からのワンタップアクション */}
+          <div className="flex flex-col sm:flex-row gap-2 pt-1">
             <a
-              href={getMapSearchUrl('避難所')}
+              href={getMapSearchUrl('指定避難所')}
               target="_blank"
               rel="noreferrer"
-              className="py-2.5 px-3 bg-[#2196f3] hover:bg-[#1e88e5] text-white text-center rounded-lg text-xs md:text-sm font-bold shadow-2xs transition-colors block"
+              className="flex-1 py-2.5 px-3 bg-[#1976d2] hover:bg-[#1565c0] text-white text-xs md:text-sm font-bold rounded-xl text-center shadow-2xs transition-colors flex items-center justify-center gap-1.5"
             >
-              🗺️ 周辺の避難所を地図で一覧 ↗
+              <SearchIcon className="w-4 h-4 shrink-0" />
+              <span>Googleマップで周辺避難所を開く ↗</span>
             </a>
             <a
-              href="https://disaportal.gsi.go.jp/maps/"
+              href={getWalkingRouteUrl('最寄りの指定避難所')}
               target="_blank"
               rel="noreferrer"
-              className="py-2.5 px-3 bg-white hover:bg-neutral-50 text-neutral-800 border border-neutral-300 text-center rounded-lg text-xs md:text-sm font-bold shadow-2xs transition-colors block"
+              className="flex-1 py-2.5 px-3 bg-neutral-900 hover:bg-neutral-800 text-white text-xs md:text-sm font-bold rounded-xl text-center shadow-2xs transition-colors flex items-center justify-center gap-1.5"
             >
-              ⚠️ 重ねるハザードマップ（公式） ↗
+              <WalkIcon className="w-4 h-4 shrink-0" />
+              <span>最寄りの避難所へ徒歩ルート ↗</span>
             </a>
           </div>
         </div>
 
-        {/* 手動検索（市区町村名・駅名） */}
-        <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200 space-y-3">
-          <label htmlFor="shelter-search" className="block text-xs md:text-sm font-bold text-neutral-800">
-            🔍 市区町村名や駅名で探す（手動検索）
+        {/* 市区町村・駅名での手動検索セクション */}
+        <div className="p-4 bg-neutral-50 rounded-xl border border-neutral-200/90 space-y-3">
+          <label htmlFor="manual-search-input" className="font-bold text-xs md:text-sm text-neutral-800 flex items-center gap-1.5">
+            <SearchIcon className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
+            <span>市区町村名や駅名で探す</span>
           </label>
-          <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2">
+          <p className="text-2xs text-neutral-500 m-0 leading-relaxed">
+            家族の職場・学校や、離れて暮らす実家周辺の避難所を検索できます。
+          </p>
+
+          <form onSubmit={handleSearchSubmit} className="flex gap-2">
             <input
-              id="shelter-search"
+              id="manual-search-input"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="例：新宿区、横浜駅、福岡市博多区"
-              className="flex-1 p-2.5 border border-neutral-300 rounded-lg text-xs md:text-sm bg-white text-neutral-900 focus-visible:outline-2 focus-visible:outline-[#2196f3]"
+              placeholder="例：渋谷区、横浜駅、大阪市北区"
+              className="flex-1 p-2.5 border border-neutral-300 rounded-xl text-xs md:text-sm bg-white text-neutral-900 focus-visible:outline-2 focus-visible:outline-[#1976d2]"
             />
             <button
               type="submit"
               disabled={isSearching}
-              className="py-2.5 px-5 bg-[#2196f3] hover:bg-[#1e88e5] text-white rounded-lg text-xs md:text-sm font-bold cursor-pointer transition-colors shadow-2xs whitespace-nowrap shrink-0 disabled:opacity-50 flex items-center justify-center gap-1.5"
+              className="py-2.5 px-4 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs md:text-sm font-bold cursor-pointer transition-colors shadow-2xs shrink-0 disabled:opacity-50"
             >
-              <span>{isSearching ? '検索中...' : '🔍 地図で検索'}</span>
+              {isSearching ? '検索中' : '検索'}
             </button>
           </form>
 
-          {/* 直近の検索履歴 */}
+          {/* 検索履歴 / クイック選択 */}
           {recentSearches.length > 0 && (
-            <div className="flex items-center gap-1.5 flex-wrap pt-0.5 text-xs">
-              <span className="text-neutral-500 shrink-0">最近の検索：</span>
+            <div className="flex items-center gap-1.5 flex-wrap pt-1 text-2xs text-neutral-600">
+              <span className="font-semibold text-neutral-500">最近の検索：</span>
               {recentSearches.map((item, idx) => (
                 <button
                   key={idx}
                   type="button"
                   onClick={() => handleSelectRecent(item)}
-                  className="py-0.5 px-2 bg-white border border-neutral-300 rounded-md text-neutral-700 hover:text-neutral-900 hover:border-neutral-400 cursor-pointer transition-colors"
+                  className="py-0.5 px-2 bg-white border border-neutral-300 rounded-md hover:border-[#1976d2] hover:text-[#1976d2] transition-colors cursor-pointer"
                 >
                   {item}
                 </button>
@@ -438,144 +458,130 @@ export const Shelters: React.FC<SheltersProps> = ({ onBack }) => {
             </div>
           )}
 
-          {/* 検索結果アクティブバナー */}
           {appliedSearch && (
-            <div className="mt-2 p-3 bg-blue-50 border-2 border-[#2196f3] rounded-xl text-neutral-900 space-y-2.5 shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-xs md:text-sm text-[#1976d2] flex items-center gap-1.5">
-                  <span>📍</span>
-                  <span>「{appliedSearch}」周辺の避難所を検索しました</span>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAppliedSearch('');
-                    setSearchQuery('');
-                    setTargetCoords(null);
-                  }}
-                  className="text-xs text-neutral-500 hover:text-neutral-800 underline cursor-pointer"
-                >
-                  現在地表示に戻す
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
-                <a
-                  href={`https://www.google.com/maps/search/${encodeURIComponent(`${appliedSearch} ${getDisasterKeyword('避難所')}`)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="py-2 px-3 bg-[#2196f3] hover:bg-[#1e88e5] text-white text-center font-bold rounded-lg text-xs md:text-sm shadow-2xs transition-colors block"
-                >
-                  🗺️ 「{appliedSearch}」の避難所をGoogle マップで表示 ↗
-                </a>
-                <a
-                  href={`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(appliedSearch)}&destination=${encodeURIComponent(getDisasterKeyword('指定避難所'))}&travelmode=walking`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="py-2 px-3 bg-[#28a745] hover:bg-[#218838] text-white text-center font-bold rounded-lg text-xs md:text-sm shadow-2xs transition-colors block"
-                >
-                  🚶 「{appliedSearch}」からの徒歩ルート ↗
-                </a>
-              </div>
+            <div className="pt-2 border-t border-neutral-200/80 flex flex-col sm:flex-row gap-2">
+              <a
+                href={getMapSearchUrl('指定避難所')}
+                target="_blank"
+                rel="noreferrer"
+                className="flex-1 py-2 px-3 bg-[#1976d2] hover:bg-[#1565c0] text-white text-xs font-bold rounded-lg text-center transition-colors block"
+              >
+                「{appliedSearch}」周辺の避難所を地図で開く ↗
+              </a>
+              <a
+                href={getWalkingRouteUrl('最寄りの指定避難所')}
+                target="_blank"
+                rel="noreferrer"
+                className="flex-1 py-2 px-3 bg-neutral-800 hover:bg-neutral-900 text-white text-xs font-bold rounded-lg text-center transition-colors block"
+              >
+                「{appliedSearch}」からの徒歩ルート ↗
+              </a>
             </div>
           )}
         </div>
 
-        {/* 災害種別アドバイス枠 */}
-        <div className={`p-3.5 rounded-lg border text-xs md:text-sm ${notice.bg}`}>
-          <div className="font-bold mb-1">{notice.title}</div>
-          <div className="leading-relaxed">{notice.advice}</div>
-        </div>
-
-        {/* 国土地理院 防災地図（普段は非表示、必要な時だけ開閉） */}
-        <div className="border border-neutral-200 rounded-xl overflow-hidden bg-white shadow-2xs">
+        {/* 国土地理院・指定緊急避難場所マップ展開 */}
+        <div className="border border-neutral-200 rounded-xl overflow-hidden">
           <button
             type="button"
-            onClick={() => setShowGsiMap((prev) => !prev)}
-            className="w-full p-3.5 flex items-center justify-between text-left hover:bg-neutral-50 transition-colors cursor-pointer"
+            onClick={() => setShowGsiMap(!showGsiMap)}
+            className="w-full p-3 bg-neutral-100 hover:bg-neutral-200/80 text-left font-bold text-xs md:text-sm text-neutral-800 flex items-center justify-between transition-colors cursor-pointer"
           >
-            <div className="flex items-center gap-2">
-              <span className="text-lg">🗺️</span>
-              <div>
-                <span className="font-bold text-sm text-neutral-800 block">
-                  国土地理院 防災地図（標高・詳細地形）
-                </span>
-                <span className="text-xs text-neutral-500 block font-normal">
-                  {showGsiMap ? 'タップで地図を閉じます' : 'タップで地図を展開・表示します'}
-                </span>
-              </div>
-            </div>
-            <span className="text-xs font-bold py-1 px-2.5 rounded-md bg-neutral-100 text-neutral-700 border border-neutral-200 shrink-0">
-              {showGsiMap ? '閉じる ▲' : '表示する ▼'}
+            <span className="flex items-center gap-2">
+              <MapFoldIcon className="w-4 h-4 text-neutral-700 shrink-0" />
+              <span>国土地理院 指定緊急避難場所マップを表示（ブラウザ内地図）</span>
             </span>
+            <span className="text-xs">{showGsiMap ? '▲ 閉じる' : '▼ 表示する'}</span>
           </button>
 
           {showGsiMap && (
-            <div className="p-3.5 pt-0 border-t border-neutral-100 space-y-2.5">
-              <div className="flex items-center justify-between pt-2">
-                <span className="text-xs text-neutral-500">
-                  ※標高や詳細地形、等高線を確認したい場合にご利用ください
-                </span>
+            <div className="p-3 bg-white space-y-2">
+              <p className="text-2xs text-neutral-500 m-0">
+                国土地理院の公的データベースに基づく全国の指定緊急避難場所マップです。
+              </p>
+              <div className="w-full h-80 sm:h-96 md:h-[460px] rounded-xl overflow-hidden border border-neutral-300 relative bg-neutral-100">
+                <iframe
+                  title="国土地理院 指定緊急避難場所マップ"
+                  src={getGsiMapUrl()}
+                  className="w-full h-full border-none"
+                  loading="lazy"
+                />
+              </div>
+              <div className="text-right">
                 <a
                   href={getGsiMapUrl()}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-xs text-[#1976d2] hover:underline font-semibold"
+                  className="text-2xs text-[#1976d2] hover:underline font-bold"
                 >
-                  拡大地図で開く ↗
+                  国土地理院地図を別画面で全画面表示 ↗
                 </a>
-              </div>
-              <div className="w-full h-[360px] rounded-lg overflow-hidden border border-neutral-300 shadow-2xs">
-                <iframe
-                  src={getGsiMapUrl()}
-                  className="w-full h-full border-0"
-                  title="国土地理院の地図"
-                  loading="lazy"
-                />
               </div>
             </div>
           )}
         </div>
 
-        {/* 施設別の避難場所案内カード */}
-        <div className="space-y-3 pt-1">
-          <h3 className="text-base font-bold text-neutral-800 m-0">
-            🏢 避難施設別の案内
-          </h3>
-          {filteredFacilities.map((facility, index) => (
-            <div
-              key={index}
-              className="p-4 bg-neutral-50 border-l-6 border-l-[#28a745] rounded-lg border border-neutral-200 shadow-2xs space-y-2"
-            >
-              <div className="flex items-center justify-between">
-                <h4 className="text-base font-bold text-neutral-800 m-0 flex items-center gap-1.5">
-                  <span>{facility.icon}</span>
-                  <span>{facility.name}</span>
-                </h4>
+        {/* 施設種別ごとの検索リスト */}
+        <div className="space-y-2.5 pt-1">
+          <div className="text-xs font-bold text-neutral-800 flex items-center justify-between">
+            <span>施設種別から直接探す：</span>
+            <span className="text-2xs text-neutral-400 font-normal">
+              {selectedDisaster !== 'all' && '※選択中の災害に適した施設を優先表示'}
+            </span>
+          </div>
+
+          <div className="space-y-2">
+            {filteredFacilities.map((fac, idx) => (
+              <div
+                key={idx}
+                className="p-3 bg-neutral-50 rounded-xl border border-neutral-200/80 flex items-center justify-between gap-3 text-xs"
+              >
+                <div className="space-y-0.5 min-w-0 flex-1">
+                  <div className="font-bold text-neutral-900 flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-neutral-100 flex items-center justify-center shrink-0">
+                      {fac.icon}
+                    </div>
+                    <span className="truncate">{fac.name}</span>
+                  </div>
+                  <p className="text-2xs text-neutral-500 m-0 leading-relaxed truncate pl-9">
+                    {fac.desc}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <a
+                    href={getMapSearchUrl(fac.searchTag)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="py-1 px-2.5 bg-neutral-900 hover:bg-neutral-800 text-white rounded-lg text-2xs font-bold transition-colors block text-center"
+                  >
+                    探す ↗
+                  </a>
+                  <a
+                    href={getWalkingRouteUrl(fac.searchTag)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="py-1 px-2.5 bg-neutral-200 hover:bg-neutral-300 text-neutral-800 rounded-lg text-2xs font-medium transition-colors block text-center"
+                  >
+                    ルート ↗
+                  </a>
+                </div>
               </div>
-              <p className="text-xs md:text-sm text-neutral-600 m-0 leading-relaxed">
-                {facility.desc}
-              </p>
-              <div className="pt-1 flex flex-wrap gap-2">
-                <a
-                  href={getMapSearchUrl(facility.searchTag)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-block py-1.5 px-3 bg-[#2196f3] hover:bg-[#1e88e5] text-white text-xs font-bold rounded-md shadow-2xs"
-                >
-                  🗺️ 周辺を探す ↗
-                </a>
-                <a
-                  href={getWalkingRouteUrl(facility.searchTag)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-block py-1.5 px-3 bg-white hover:bg-neutral-100 text-[#28a745] border border-[#28a745] text-xs font-bold rounded-md shadow-2xs"
-                >
-                  🚶 ルート案内 ↗
-                </a>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
+        </div>
+
+        {/* 避難時のチェック事項 */}
+        <div className="p-3.5 bg-amber-50/60 rounded-xl border border-amber-200/80 space-y-2 text-xs text-amber-950">
+          <div className="font-bold flex items-center gap-1.5">
+            <LightbulbIcon className="w-4 h-4 text-amber-700 shrink-0" />
+            <span>避難所へ向かう前の重要チェック</span>
+          </div>
+          <ul className="list-disc pl-4 space-y-1 text-2xs leading-relaxed m-0 text-neutral-700">
+            <li>ブレーカーを落とし、ガスの元栓を閉める（通電火災防止）</li>
+            <li>底の厚い靴（スニーカー）を履く（長靴は水が入ると脱げなくなるため危険）</li>
+            <li>玄関に避難先と日時を書いたメモを残す</li>
+            <li>一人で行動せず、近所と声を掛け合い複数人で避難する</li>
+          </ul>
         </div>
       </div>
 
@@ -583,7 +589,7 @@ export const Shelters: React.FC<SheltersProps> = ({ onBack }) => {
       <button
         type="button"
         onClick={onBack}
-        className="w-full py-3 bg-neutral-900 hover:bg-neutral-800 text-white text-center rounded-xl font-bold transition-colors cursor-pointer shadow-2xs block focus-visible:outline-2 focus-visible:outline-neutral-900"
+        className="w-full py-3 bg-neutral-900 hover:bg-neutral-800 text-white text-center rounded-xl font-bold transition-all cursor-pointer shadow-2xs hover:shadow-xs active:scale-[0.99] block text-xs md:text-sm focus-visible:outline-2 focus-visible:outline-neutral-900"
       >
         ← ホームに戻る
       </button>

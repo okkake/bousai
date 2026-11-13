@@ -20,8 +20,6 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate }) => 
         return { title: '災害時の行動マニュアル', subtitle: '地震・台風・火災時の適切な初動' };
       case 'family':
         return { title: '家族の安否・連絡先', subtitle: '集合場所・連絡先メモ・伝言ダイヤル' };
-      case 'quiz':
-        return { title: '防災知識クイズ', subtitle: 'クイズで防災の知識と判断力を学ぶ' };
       case 'hazard':
         return { title: 'ハザードマップ・リスク確認', subtitle: '国交省浸水想定・土砂災害・標高と避難判定' };
       case 'home':
@@ -34,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({ currentScreen, onNavigate }) => 
 
   return (
     <div className="text-neutral-900 transition-all">
-      <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
         {/* Brand / Title */}
         <div
           onClick={() => onNavigate('home')}

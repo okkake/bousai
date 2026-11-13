@@ -1,4 +1,6 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
+import type { Request, Response } from 'express';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { XMLParser } from 'fast-xml-parser';
@@ -7,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -938,7 +940,12 @@ app.get('/api/weather', async (req: Request, res: Response) => {
 // Vite Dev Middleware / Static Production Serve
 // =========================
 async function startServer() {
-  const isProd = process.env.NODE_ENV === 'production';
+  const distDir = path.join(__dirname, 'dist');
+  const distIndexPath = path.join(distDir, 'index.html');
+  const isDevLifecycle = process.env.npm_lifecycle_event === 'dev';
+  const isProd =
+    process.env.NODE_ENV === 'production' ||
+    (!isDevLifecycle && process.env.NODE_ENV !== 'development' && fs.existsSync(distIndexPath));
 
   if (!isProd) {
     const { createServer } = await import('vite');
@@ -948,9 +955,9 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static(path.join(__dirname, 'dist')));
-    app.get('*', (_req, res) => {
-      res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+    app.use(express.static(distDir));
+    app.get('/{*splat}', (_req, res) => {
+      res.sendFile(distIndexPath);
     });
   }
 

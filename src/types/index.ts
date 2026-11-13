@@ -40,6 +40,9 @@ export interface WeatherData {
 
 export interface QuizQuestion {
   question: string;
+  category: string;
   answers: string[];
   correct: number;
+  explanation: string;
 }
+
